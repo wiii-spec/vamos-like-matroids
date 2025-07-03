@@ -32,6 +32,14 @@ def invariant1 (A: PartialMatroid) : List Nat := count A.matroid.join.sort
  of natural numbers in it-/
 def pairing (A: List (List Nat)) : List Nat := count (((((A.map)) (List.pairs)).join).sort)
 
+
+
+ /-
+ All pairs that are in the same subset in matroid
+
+ pairing gives count of each pair
+ -/
+
 /-- Takes in the matroid part of a partial matroid and gives out a list of all the possible pairs
  of natural numbers in it-/
 def invariant2 (A: PartialMatroid) : List Nat := pairing A.matroid

@@ -24,6 +24,12 @@ appear, but rather the frequency of different elements. Utilizes `countAux`
 connections.
 -/
 
+
+
+/-
+Shouls be a part of Buckets.lean
+-/
+
 /-- Function that sorts, outside PartialMatroid namespace. It will sort lists by dtermining which
 list is greater. Its criteria for determining the greater list is whichever list generates a greater
 number first-/
