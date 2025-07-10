@@ -26,7 +26,6 @@ theorem combinations_entries_lengths (n k : Nat) :
       apply H
       apply hl2
 
-
 /-- Every entry in each of the lists in `combinations n k` is less than n. -/
 theorem combinations_entries_bounds (n k : Nat) :
     (combinations n k).all (fun l ↦ l.all (fun i ↦ i < n)) := by
@@ -37,7 +36,17 @@ theorem combinations_entries_bounds (n k : Nat) :
       simp [combinations]
       intro l ha x h4
       obtain h1 | h2 := ha
-      have H := combinations_entries_bounds n (k + 1)
-      sorry
-      have H := combinations_entries_bounds n k
-      sorry
+      -- inductive hypothesis
+      · have H := combinations_entries_bounds n (k + 1)
+        simp at H
+        specialize H l h1 x h4
+        omega
+      · have H := combinations_entries_bounds n k
+        simp at H
+        obtain ⟨ a,hx, hy⟩:= h2
+        rw[<- hy] at h4
+        simp at h4
+        obtain h5|h6 := h4
+        · specialize H a hx x h5
+          omega
+        · omega
