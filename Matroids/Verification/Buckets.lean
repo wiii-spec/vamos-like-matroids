@@ -141,8 +141,38 @@ lemma groupByBucket_normalized (lA : List PartialMatroid)
 
 
 
+lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
+  count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
+  = count (List.sort (List.join L)) := by
+  sorry
+
+
+lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
+  (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant1 M₁ = invariant1 M₂ := by
+  unfold sameUpToRelabelling at hb
+  unfold invariant1
+  simp at hb
+  -- hopefully follows from count_of_relabelling?
+  sorry
+
+
+
+lemma invariant1_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
+    invariant1 M₁ = invariant1 M₂ := by
+  unfold permutationsComparison at h
+  simp at h
+  obtain ⟨ f, ha,hb ⟩  := h
+  apply invariant1_of_sameUpTolabelling ha hb
+
+
+lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
+    (groupByFirstInvariant A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+  -- use `invariant1_of_isomorphic`
+  sorry
+
 /- Lemma for countBuckets (related to Theorem 1): If the input is an list partial matroids
-(order does matter, for both the lists and for the members) with range i < n and lenght = r, then
+(order does matter, for both the lishfts and for the members) with range i < n and lenght = r, then
 the output will be a lawful sparse paving matroid -/
 /- After rethinking, we might not need to prove anything about countBuckets since it is not used
 directly in the main computation.-/
@@ -153,4 +183,5 @@ partial matroids.
 lemma nonisomorphic_groupByBucket (A : List PartialMatroid) :
     (groupByBucket A).Pairwise fun L₁ L₂ ↦
       L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid :=
+  -- use theorem `nonisomorphic_groupByFirstInvariant` and similar for other invariants
   sorry
