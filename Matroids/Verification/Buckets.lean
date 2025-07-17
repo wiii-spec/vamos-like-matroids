@@ -139,22 +139,19 @@ lemma groupByBucket_normalized (lA : List PartialMatroid)
     apply hlA
 
 
-
-
-lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
-  count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
-  = count (List.sort (List.join L)) := by
-  sorry
-
+-----prove group by bucket
 
 lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
   (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant1 M₁ = invariant1 M₂ := by
   unfold sameUpToRelabelling at hb
-  unfold invariant1
   simp at hb
+  unfold invariant1
+  have h := @count_of_relabelling M₂.matroid f ha
+  rw[hb] at h
+  rw[sort_join_sort] at h
+  rw[sort_join_map_sort] at h
+  apply h
   -- hopefully follows from count_of_relabelling?
-  sorry
-
 
 
 lemma invariant1_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
@@ -168,8 +165,19 @@ lemma invariant1_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsCom
 lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
     (groupByFirstInvariant A).Pairwise fun L₁ L₂ ↦
       L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-  -- use `invariant1_of_isomorphic`
-  sorry
+
+    unfold groupByFirstInvariant
+    rw [List.pairwise_iff_get]
+    intro i j h
+    rw[List.forall_iff_forall_mem]
+    intro x hx
+    rw[List.forall_iff_forall_mem]
+    intro y hy
+    suffices h : invariant1 x ≠ invariant1 y
+    contrapose! h
+    apply invariant1_of_isomorphic
+    exact h
+    apply ne_of_groupByValue h.ne hx hy
 
 /- Lemma for countBuckets (related to Theorem 1): If the input is an list partial matroids
 (order does matter, for both the lishfts and for the members) with range i < n and lenght = r, then

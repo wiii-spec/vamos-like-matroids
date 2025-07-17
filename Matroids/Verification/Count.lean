@@ -54,3 +54,58 @@ lemma forall_groupByValue (f : α → List ℕ) (A : List α) (hA : A.Forall P) 
   simp
   apply forall_groupByValueAux
   exact hA
+
+
+
+--
+
+lemma sort_join_sort {α :Type} [LinearOrder α] (L : List (List α)) :
+  List.sort (List.join (List.sort L)) = List.sort (List.join (L)) := by
+  match L with
+  |[] => simp
+  |a :: ll =>
+    simp
+    have h := sort_join_sort ll
+    match a with
+    |[] =>
+      simp
+      sorry
+    |c :: l =>
+      sorry
+-- proof idea: consider number of occurence in each list, should be the same
+
+lemma sort_join_map_sort (L : List (List Nat)) :
+  List.sort (List.join (List.map List.sort L)) = List.sort (List.join (L)) := by
+  sorry
+
+-- TODO generalize codomain of `f` to arbitrary linear order output
+-- apparently some `BEq` bug
+theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List ℕ} --[LinearOrder X]
+    {i j : Fin (groupByValue (A.mergeSort (f · < f ·)) f).length}
+    (h : i ≠ j) {x y : PartialMatroid}
+    (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
+    (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
+    f x ≠ f y := by
+  sorry
+
+
+lemma countAux_of_relabelling {L : List Nat} {f : ℕ → ℕ} (ha : f.Bijective):
+  countAux L = countAux (L.map f):= by
+  unfold countAux
+  match L with
+  | [] => simp
+  | [a] => simp
+  | a :: b :: l =>
+    simp
+    have induction_h := @countAux_of_relabelling (b::l) f ha
+    by_cases hab : a = b
+    · rw[hab]
+      simp
+      rw[induction_h]
+      simp
+    · rw [if_neg hab]
+      have : f a ≠ f b := ha.injective.ne hab
+      rw[if_neg this]
+      simp
+      rw[induction_h]
+      simp

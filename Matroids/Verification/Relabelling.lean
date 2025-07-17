@@ -1,5 +1,6 @@
 import Matroids.Verification.Basic
 import Matroids.Relabelling
+import Matroids.Verification.Count
 
 
 
@@ -129,3 +130,18 @@ theorem nonisomorphic_of_length {A B : List (List Nat)} (h : A.length ≠ B.leng
   clear h
   apply length_eq_of_permutationsComparison
   apply h₁
+
+
+
+lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
+  count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
+  = count (List.sort (List.join L)) := by
+  rw[sort_join_sort]
+  rw[sort_join_map_sort]
+  unfold count
+  sorry
+
+
+lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
+  List.join (relabelling L f) = List.map f (List.join L) := by
+  sorry
