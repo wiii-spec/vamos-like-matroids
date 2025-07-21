@@ -141,6 +141,7 @@ lemma groupByBucket_normalized (lA : List PartialMatroid)
 
 -----prove group by bucket
 
+
 lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
   (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant1 M₁ = invariant1 M₂ := by
   unfold sameUpToRelabelling at hb

@@ -14,3 +14,5 @@ example : List (ℤ × ℕ) := [(2, 3), (4, 6), (10, 24)]
 
 #eval count ([[0, 1], [0, 1], [1, 0], [0, 1, 3,2], [0, 1, 9], [0, 1], [0,2]]) /- Note, this is not
 a list of partial matroids-/
+
+#eval check_stick [1,1,2,3]

@@ -33,7 +33,7 @@ Shouls be a part of Buckets.lean
 /-- Function that sorts, outside PartialMatroid namespace. It will sort lists by dtermining which
 list is greater. Its criteria for determining the greater list is whichever list generates a greater
 number first-/
-def List.sort (l :  List X) : List X :=
+def List.sort [LinearOrder X] (l : List X) : List X :=
    l.mergeSort (· < · )
 
 
@@ -61,7 +61,7 @@ by their characteristic obtained from running them through a mapping function. I
 looking for partial matroids that returns the same value through the function and puts them into
 a list. If another partial matroid returns a different vlue through the function, then a new list is
 created-/
-def groupByValueAux (f: PartialMatroid → X) : List PartialMatroid → (List PartialMatroid) × List (List PartialMatroid)
+def groupByValueAux [LinearOrder X] (f: PartialMatroid → X) : List PartialMatroid → (List PartialMatroid) × List (List PartialMatroid)
    | [] => ([], []) -- check
    | [pm] => ([pm], []) -- check
    | a :: b :: t =>
@@ -74,6 +74,19 @@ def groupByValueAux (f: PartialMatroid → X) : List PartialMatroid → (List Pa
 
 /--Puts the list differentiated by category togethr into a list of lists. In the end, it becomes
 a list of list of partil matroids. -/
-def groupByValue (l: List PartialMatroid) (f: PartialMatroid → X): List (List PartialMatroid) :=
+def groupByValue [LinearOrder X] (l: List PartialMatroid) (f: PartialMatroid → X) : List (List PartialMatroid) :=
    let (c, finishedCount) := groupByValueAux f l
    (c::finishedCount)
+
+
+
+--stick: all elements with the same value are consecutive to each other
+def check_stick [LinearOrder X]: List X → List X
+   | [] => []
+   | [a] => [a]
+   | a :: b :: l =>
+      let induction_l := check_stick (b :: l)
+      if a == b then
+         induction_l
+      else
+         a :: induction_l

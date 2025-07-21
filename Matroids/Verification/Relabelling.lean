@@ -133,15 +133,38 @@ theorem nonisomorphic_of_length {A B : List (List Nat)} (h : A.length ≠ B.leng
 
 
 
+----TODO: not difficult
+lemma permutation_bijective (n : ℕ):
+    ∀ f ∈ permutation n, Function.Bijective f := by
+  match n with
+  | 0 =>
+    unfold permutation
+    simp
+    exact Function.bijective_id
+  | k + 1 =>
+    have induction_h := permutation_bijective k
+    unfold permutation
+    simp
+    intro g hg
+    unfold HMul.hMul at hg
+    sorry
+
+
+
+
+lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} :
+  List.join (relabelling L f) = List.map f (List.join L) := by
+  unfold relabelling
+  simp
+
+
 lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
   count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
   = count (List.sort (List.join L)) := by
   rw[sort_join_sort]
   rw[sort_join_map_sort]
-  unfold count
-  sorry
-
-
-lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
-  List.join (relabelling L f) = List.map f (List.join L) := by
-  sorry
+  rw[join_of_relabelling]
+  simp
+  rw[count_of_sort_map]
+  apply permutation_bijective 8
+  exact ha
