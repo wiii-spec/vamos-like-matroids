@@ -134,6 +134,33 @@ theorem nonisomorphic_of_length {A B : List (List Nat)} (h : A.length ≠ B.leng
 
 
 ----TODO: not difficult
+lemma list_prop (P : β → Prop) (l : List α) (f : α → β ) (hp : ∀a ∈ l, P (f a)):
+    ∀g ∈ List.map f l, P g := by
+  intro g hg
+  rw [@List.mem_map] at hg
+  obtain ⟨a, ha, hfa⟩ := hg
+  specialize hp a ha
+  rw[hfa] at hp
+  exact hp
+
+
+
+lemma List.relabelling_mem_mul (l₁ l₂ : List (Nat → Nat)) (hg : g ∈ l₁ * l₂) :
+    ∃ g₁ ∈ l₁, ∃ g₂ ∈ l₂, g = g₁ ∘ g₂ := by
+  change g ∈ (l₁.product l₂).map (Function.uncurry Function.comp) at hg
+  rw[@List.mem_map] at hg
+  simp at hg
+  obtain ⟨a, b, hab, habg⟩ := hg
+  rw [@pair_mem_product] at hab
+  use a
+  constructor
+  · exact hab.1
+  · use b
+    · constructor
+      · exact hab.2
+      · rw[habg]
+
+
 lemma permutation_bijective (n : ℕ):
     ∀ f ∈ permutation n, Function.Bijective f := by
   match n with
@@ -146,8 +173,20 @@ lemma permutation_bijective (n : ℕ):
     unfold permutation
     simp
     intro g hg
-    unfold HMul.hMul at hg
-    sorry
+    -- apply list_prop Function.Bijective (List.range (k+1)) (Equiv.swapCore k)
+    -- simp at hg
+    apply List.relabelling_mem_mul at hg
+    obtain ⟨ g₁, hg1, g₂ , hg2, hgg⟩ := hg
+    specialize induction_h g₂ hg2
+    rw[hgg]
+    have : Function.Bijective g₁ := by
+      apply list_prop Function.Bijective (List.range (k+1)) (Equiv.swapCore k)
+      · intro a _
+        apply Function.Involutive.bijective
+        intro x
+        exact Equiv.swapCore_swapCore x k a
+      · exact hg1
+    exact Function.Bijective.comp this induction_h
 
 
 
@@ -157,6 +196,8 @@ lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} :
   unfold relabelling
   simp
 
+-- seems like this issue will go away when we bump to a newer Lean version
+theorem badBeq : instBEqNat = @instBEq ℕ Nat.decEq := sorry
 
 lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
   count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
@@ -165,6 +206,9 @@ lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ p
   rw[sort_join_map_sort]
   rw[join_of_relabelling]
   simp
-  rw[count_of_sort_map]
-  apply permutation_bijective 8
-  exact ha
+  have hf := permutation_bijective 8
+  specialize hf f ha
+  have dummy := count_of_sort_map L hf
+  convert dummy
+  rw [badBeq]
+  rw [badBeq]

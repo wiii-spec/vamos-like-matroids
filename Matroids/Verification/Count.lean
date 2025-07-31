@@ -80,6 +80,18 @@ lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
 
 -- TODO generalize codomain of `f` to arbitrary linear order output
 -- apparently some `BEq` bug
+
+--UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
+
+theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {i j : Fin (groupByValue (A.mergeSort (f · < f ·)) f).length}
+    (h : i ≠ j) {x y : PartialMatroid}
+    (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
+    (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
+    f x ≠ f y := by
+  sorry
+
+-- this should be a simple consequence of the above but there are BEq issues, skip for now
 theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List Nat}
     {i j : Fin (groupByValue (A.mergeSort (f · < f ·)) f).length}
     (h : i ≠ j) {x y : PartialMatroid}
@@ -88,8 +100,7 @@ theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List
     f x ≠ f y := by
   sorry
 
-
-lemma countAux_of_map {L : List Nat} {f : ℕ → ℕ} (ha : f.Bijective):
+lemma countAux_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):
     countAux L = countAux (L.map f):= by
   unfold countAux
   match L with
@@ -97,7 +108,7 @@ lemma countAux_of_map {L : List Nat} {f : ℕ → ℕ} (ha : f.Bijective):
   | [a] => simp
   | a :: b :: l =>
     simp
-    have induction_h := @countAux_of_map (b::l) f ha
+    have induction_h := @countAux_of_map X (b :: l) (inferInstance) f ha
     by_cases hab : a = b
     · rw[hab]
       simp
@@ -110,7 +121,7 @@ lemma countAux_of_map {L : List Nat} {f : ℕ → ℕ} (ha : f.Bijective):
       rw[induction_h]
       simp
 
-lemma count_of_map {L : List Nat} {f : ℕ → ℕ} (ha : f.Bijective):
+lemma count_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):
     count L = count (L.map f):= by
   unfold count
   rw[countAux_of_map ha]
@@ -198,11 +209,73 @@ lemma sort_stick (L : List X) [LinearOrder X]:
   --proof is simple, just need syntax to change < to ≠
   sorry
 
+lemma empty_stick {L : List X} [LinearOrder X] (hl : L = []):
+    Sticking L := by
+  rw[hl]
+  unfold Sticking
+  unfold check_stick
+  simp
 
-lemma count_of_sort_map {L : List (List ℕ)} {f : ℕ → ℕ} (ha : f.Bijective) :
+
+lemma tail_stick {L : List X} [LinearOrder X] (hl : Sticking L):
+    Sticking L.tail := by
+  unfold List.tail
+  match L with
+  | [] =>
+    simp
+    exact hl
+  | a :: l1 =>
+    simp
+    unfold Sticking at hl
+    unfold check_stick at hl
+    match l1 with
+    | [] =>
+      apply empty_stick
+      simp
+    | b :: l =>
+      sorry
+
+lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → X} (hf: f.Bijective):
+    Sticking (L.map f) := by
+  match L with
+  |[] => exact hl
+  |[a] =>
+    simp
+    unfold Sticking
+    unfold check_stick
+    simp
+  | a :: b :: l =>
+    --need b::l sticking, should be simple
+    -- have inductive_hl := map_stick_stick (@tail_stick X (a :: b :: l))
+    sorry
+
+--main difficulty
+/-
+Sticking l:
+check_stick l = perm f check_stick L.sort
+and
+countAux L = f countAux sort L
+-/
+lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
+    count L = count (List.sort L) := by
+  unfold count
+  sorry
+
+lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
+    List.sort ( List.map f L.sort) = List.sort (List.map f L) := by
+  sorry
+
+lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [LinearOrder X]:
     count (List.sort (List.join (List.map (List.map f) L))) = count (List.sort (List.join L)) := by
   rw [← List.map_join]
+  rw[← sort_map_sort]
+  have h2 := map_stick_stick (sort_stick L.join) hf
+  rw[← count_of_stick h2]
+  rw[← count_of_map hf]
   -- unfold count
   -- simp [-List.map_join]
   -- congr! 3
-  sorry
+
+#check List.Perm
+-- #check List.Subseq
+#check List.tail

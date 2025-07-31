@@ -178,7 +178,10 @@ lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
     contrapose! h
     apply invariant1_of_isomorphic
     exact h
-    apply ne_of_groupByValue h.ne hx hy
+    exact ne_of_groupByValue h.ne hx hy
+
+  -- Fin (List.length (groupByValue (List.mergeSort (fun l1 l2 => invariant1 l1 < invariant1 l2) A) invariant1))
+  -- Fin (List.length (groupByValue (List.mergeSort (fun x x_1 => invariant1 x < invariant1 x_1) A) invariant1))
 
 /- Lemma for countBuckets (related to Theorem 1): If the input is an list partial matroids
 (order does matter, for both the lishfts and for the members) with range i < n and lenght = r, then
