@@ -78,6 +78,18 @@ buckets of the `i`-augmentations of the Vamos matroid, then they are different. 
 theorem forall_forall_nonisomorphic_prunedVamos (i : ℕ) :
     (prunedVamos i).Pairwise fun l₁ l₂ ↦
     l₁.Forall fun A ↦ l₂.Forall fun B ↦ ¬permutationsComparison 8 A.matroid B.matroid := by
+  rw [prunedVamos_def]
+  unfold augmentedVamos
+  let L := PartialMatroid.groupByBucket (PartialMatroid.augmentationsFinal i Vamos)
+  let P (L1 L2) : Prop := ¬ permutationsComparison 8 L1 L2
+  have h := nonisomorphic_groupByBucket (PartialMatroid.augmentationsFinal i Vamos)
+  change List.Pairwise
+    (fun L₁ L₂ =>
+      List.Forall (fun M₁ => List.Forall (fun M₂ => P M₁.matroid M₂.matroid) L₂) L₁)
+    L at h
+  change List.Pairwise (fun l₁ l₂ =>
+    List.Forall (fun A => List.Forall (fun B => P A.matroid B.matroid) l₂) l₁)
+    (List.map pruning L)
   sorry
 
 
