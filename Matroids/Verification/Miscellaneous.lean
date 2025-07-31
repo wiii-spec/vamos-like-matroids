@@ -125,3 +125,10 @@ theorem sorted_mergeSort_lt [PartialOrder α] {l : List α} [DecidableRel ((· :
     simp [mergeSort]
 
     sorry
+
+-- in the file Init.Data.List.Sublist
+-- added in https://github.com/leanprover/lean4/pull/5053, August 2024
+theorem List.Sublist.mem {α : Type*} {l₁ : List α} {a : α} {l₂ : List α} (hx : a ∈ l₁)
+    (hl : l₁.Sublist l₂) :
+    a ∈ l₂ :=
+  sorry

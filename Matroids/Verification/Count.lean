@@ -1,6 +1,8 @@
 import Matroids.Verification.Basic
+import Matroids.Verification.Miscellaneous
 import Matroids.Count
 import Matroids.PartialMatroid
+import Mathlib.Data.List.Destutter
 
 /- Lemma for count (related to Theorem 1):  If the input is an list of partial matroids
 (order does matter, for both the lists and for the members) with range i < n and lenght = r, then
@@ -124,42 +126,31 @@ lemma countAux_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijecti
 lemma count_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):
     count L = count (L.map f):= by
   unfold count
+  unfold countAux'
   rw[countAux_of_map ha]
 
-
---- sticking part for proofing count_of_sort_map
-def Sticking (L : List X) [LinearOrder X]: Prop :=
-    (check_stick L).Pairwise ( · ≠ · )
-
+theorem check_stick_eq_destutter (L : List X) [LinearOrder X] :
+    check_stick L = L.destutter Ne := by
+  match L with
+  | [] => simp [check_stick]
+  | [a] => simp [check_stick]
+  | a :: b :: l =>
+    rw [check_stick]
+    dsimp [List.destutter]
+    rw [List.destutter', check_stick_eq_destutter (b :: l)]
+    simp [List.destutter]
+    split_ifs with H
+    · rw [H]
+    · rfl
 
 /-Everything in check_stick is in the original list-/
-lemma check_stick_included (L : List X) [LinearOrder X] :
-    ∀ x ∈ check_stick L, x ∈ L := by
-  unfold check_stick
-  match L with
-  | [] => simp
-  | [a] => simp
-  | a :: b :: l =>
-    have induct_h := check_stick_included (b :: l)
-    by_cases hab : a = b
-    · rw[hab]
-      simp
-      simp at induct_h
-      exact induct_h
-    · simp
-      rw[if_neg hab]
-      simp at induct_h
-      simp
-      intro x hx
-      specialize induct_h x hx
-      exact
-        (Relation.reflGen_iff (fun a x => x = b ∨ x ∈ l) a x).mp (Relation.ReflGen.single induct_h)
-
-
+lemma check_stick_included (L : List X) [DecidableEq X] : ∀ x ∈ L.destutter Ne, x ∈ L :=
+  fun _ ↦ (L.destutter_sublist Ne).mem
 
 /-If L is sorted by ≤ , check_stick L is also Sorted by < -/
 lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · )) :
-    (check_stick L).Pairwise ( · < · ) := by
+    (L.destutter Ne).Pairwise ( · < · ) := by
+  rw [← check_stick_eq_destutter]
   unfold check_stick
   match L with
   | [] => simp
@@ -177,12 +168,14 @@ lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · 
     by_cases hab : a = b
     · rw[hab]
       simp
+      rw [← check_stick_eq_destutter] at induct_h
       exact induct_h
     · rw [if_neg hab]
       simp
       constructor
       · intro x hx
         have h_le := check_stick_included (b :: l)
+        rw [← check_stick_eq_destutter] at h_le
         specialize h_le x hx
         unfold List.Sorted at h
         simp at h
@@ -198,7 +191,8 @@ lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · 
             exact h3
         obtain ⟨ h_a_le_b, dummy⟩ := h1
         exact lt_of_lt_of_le (lt_of_le_of_ne h_a_le_b hab) hbx
-      · apply induct_h
+      · rw [← check_stick_eq_destutter] at induct_h
+        apply induct_h
 
 
 lemma sort_stick (L : List X) [LinearOrder X]:
@@ -249,6 +243,37 @@ lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → 
     -- have inductive_hl := map_stick_stick (@tail_stick X (a :: b :: l))
     sorry
 
+theorem destutter_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst)) :
+    List.destutter Ne (expand l) = l.map Prod.fst := by
+  sorry
+
+theorem sticking_expand_iff_pairwise_ne [LinearOrder X] (l : List (X × Nat))
+    (hl : List.Chain' Ne (List.map Prod.fst l)) :
+    Sticking (expand l) ↔ (l.map Prod.fst).Pairwise Ne := by
+  unfold Sticking
+  rw [check_stick_eq_destutter]
+  rw [destutter_expand]
+  exact hl
+
+theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst)) :
+    countAux' (expand l) = l.map Prod.snd := by
+  sorry
+
+theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
+    expand (List.zip (l.destutter Ne) (countAux' l)) = l := by
+  sorry
+
+theorem List.exists_eq_expand [DecidableEq X] (L : List X) :
+    ∃ l : List (X × Nat), L = expand l ∧ Chain' Ne (l.map Prod.fst) := by
+  -- used in expand_destutter_countAux'
+  sorry
+
+-- we think we don't need a side condition here?
+theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
+    List.sort (X := X) (expand L) = expand (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)) := by
+  sorry
+
+-- theorem
 --main difficulty
 /-
 Sticking l:
@@ -256,9 +281,32 @@ check_stick l = perm f check_stick L.sort
 and
 countAux L = f countAux sort L
 -/
+lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
+    (countAux' L).Perm (countAux' (List.sort L)) := by
+  obtain ⟨l, rfl, hl⟩ := L.exists_eq_expand
+  rw [sort_expand l]
+  dsimp
+  rw [countAux'_expand]
+  rw [countAux'_expand]
+  · symm
+    -- idea should be in List.perm_mergeSort
+    sorry
+  · rw [sticking_expand_iff_pairwise_ne _ hl] at hL
+    -- should follow from these three
+    -- List.Pairwise.chain'
+    -- List.Pairwise.perm
+    -- List.perm_mergeSort
+    sorry
+  · exact hl
+
 lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
     count L = count (List.sort L) := by
   unfold count
+  unfold List.sort
+  have := countAux_perm_of_stick hl
+  -- since mergeSort is a permutation of the original list,
+  -- LHS and RHS are permutations of each other too
+  -- since they are also both sorted they must be the same
   sorry
 
 lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:

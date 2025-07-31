@@ -33,7 +33,7 @@ Shouls be a part of Buckets.lean
 /-- Function that sorts, outside PartialMatroid namespace. It will sort lists by dtermining which
 list is greater. Its criteria for determining the greater list is whichever list generates a greater
 number first-/
-def List.sort [LinearOrder X] (l : List X) : List X :=
+def List.sort {X : Type*} [LinearOrder X] (l : List X) : List X :=
    l.mergeSort (· < · )
 
 
@@ -50,11 +50,15 @@ def countAux : List X → Nat × List Nat
       else
          (1, c :: finishedCount)
 
+def countAux' (l : List X) : List ℕ :=
+   let (c, finishedCount) := countAux l
+   (c::finishedCount)
+
 /--It sorts the counted appearance of each element. That way, it is not differentiated by the
 permutations of elements that get counted but rather by the quantity of different elements. -/
-def count (l: List X) : List Nat  :=
-   let (c, finishedCount) := countAux l
-   (c::finishedCount).sort
+def count (l: List X) : List Nat  := (countAux' l).sort
+
+def expand (l : List (X × Nat)) : List X := (l.map fun (x, n) ↦ List.replicate n x).join
 
 /--sorts a series of partial matroids (with the same original partial matroid and remaining options)
 by their characteristic obtained from running them through a mapping function. It sorts it by
@@ -90,3 +94,7 @@ def check_stick [LinearOrder X]: List X → List X
          induction_l
       else
          a :: induction_l
+
+--- sticking part for proofing count_of_sort_map
+def Sticking (L : List X) [LinearOrder X]: Prop :=
+    (check_stick L).Pairwise ( · ≠ · )
