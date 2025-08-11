@@ -29,6 +29,10 @@ lemma mem_of_mem_pruning {lA : List (PartialMatroid)} {A : PartialMatroid}
       apply hAA
       sorry
 
+lemma mem_pruning  (lA : List (PartialMatroid)):
+    List.Sublist (pruning lA) lA := by
+  sorry
+
 /-- If `A` is a list of `PartialMatroid`s, all of which are valid (n, r)-sparse paving matroids,
 then when the `pruning` operation is performed, every `PartialMatroid` in the the resulting
 list of partial matroids is still a valid (n, r)-sparse paving matroids. -/

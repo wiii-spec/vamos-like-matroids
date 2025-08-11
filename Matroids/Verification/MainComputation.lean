@@ -71,7 +71,18 @@ then point out to Lean that a list of length 1 has no repeats.
 But another method of proof is to notice that the pruning process removes repeats. -/
 theorem forall_nonisomorphic_prunedVamos (i : ℕ) :
     (prunedVamos i).Forall fun l ↦ l.Pairwise fun A₁ A₂ ↦ ¬permutationsComparison 8 A₁.matroid A₂.matroid := by
+  rw [prunedVamos_def]
+  rw [List.forall_iff_forall_mem]
+  intro l hl
+  simp at hl
+  have ⟨ a, ha, hal⟩ := hl
+  rw[<-hal]
+  apply List.Pairwise.sublist
+  apply mem_pruning a
   sorry
+
+
+
 
 /-- For a natural number `i`, partial matroids `A` and `B` drawn from *different* pruned
 buckets of the `i`-augmentations of the Vamos matroid, then they are different. -/
@@ -90,8 +101,22 @@ theorem forall_forall_nonisomorphic_prunedVamos (i : ℕ) :
   change List.Pairwise (fun l₁ l₂ =>
     List.Forall (fun A => List.Forall (fun B => P A.matroid B.matroid) l₂) l₁)
     (List.map pruning L)
-  sorry
+  rw[List.pairwise_map]
+  apply List.Pairwise.imp _ h
+  intro l₁ l₂ hl
+  rw [List.forall_iff_forall_mem]
+  intro x hx
+  rw [List.forall_iff_forall_mem]
+  intro y hy
+  apply mem_of_mem_pruning at hx
+  apply mem_of_mem_pruning at hy
+  rw[List.forall_iff_forall_mem] at hl
+  specialize hl x hx
+  rw[List.forall_iff_forall_mem] at hl
+  specialize hl y hy
+  exact hl
 
+#check List.Pairwise.imp
 
 
 

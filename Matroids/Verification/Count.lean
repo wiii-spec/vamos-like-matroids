@@ -61,6 +61,10 @@ lemma forall_groupByValue (f : α → List ℕ) (A : List α) (hA : A.Forall P) 
 
 --
 
+lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
+    List.sort ( List.map f L.sort) = List.sort (List.map f L) := by
+  sorry
+
 lemma sort_join_sort {X :Type} [LinearOrder X] (L : List (List X)) :
     List.sort (List.join (List.sort L)) = List.sort (List.join (L)) := by
   match L with
@@ -128,6 +132,7 @@ lemma count_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective)
   unfold count
   unfold countAux'
   rw[countAux_of_map ha]
+  simp
 
 theorem check_stick_eq_destutter (L : List X) [LinearOrder X] :
     check_stick L = L.destutter Ne := by
@@ -243,30 +248,231 @@ lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → 
     -- have inductive_hl := map_stick_stick (@tail_stick X (a :: b :: l))
     sorry
 
-theorem destutter_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst)) :
+
+-- need additional condition: all element in second list is nonzero (h_nonzero)
+theorem destutter_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst))
+  (h_nonzero : List.Forall (fun p => p ≠ 0) (l.map Prod.snd)):
     List.destutter Ne (expand l) = l.map Prod.fst := by
-  sorry
+  unfold expand
+  match l with
+  |[] =>
+    simp
+  | (x , n) :: l =>
+    have h1 :=  List.Chain'.tail h
+    simp at h1
+    simp at h_nonzero
+    have ⟨ n_nonzero, hl⟩ := h_nonzero
+    rw[<-List.forall_map_iff] at hl
+    have induction_hl := destutter_expand l h1 hl
+    simp
+    unfold List.destutter
+    unfold List.Chain' at h
+    simp at h
+    induction n with
+    | zero =>
+      trivial
+    | succ n ih1 =>
+      induction n with
+      | zero =>
+        simp
+        unfold List.destutter'
+        match l with
+        | [] =>
+          simp
+        | (y, m) :: l =>
+          simp
+          simp at hl
+          have hm := Nat.exists_eq_succ_of_ne_zero hl.1
+          obtain ⟨ k, hk⟩ := hm
+          rw[hk]
+          simp
+          simp at h
+          rw[if_neg h.1]
+          simp
+          unfold expand List.destutter at induction_hl
+          rw[hk] at induction_hl
+          simp at induction_hl
+          exact induction_hl
+      | succ k _ =>
+        simp at ih1
+        simp
+        rw[<-List.forall_map_iff] at ih1
+        exact ih1 hl
+
+
 
 theorem sticking_expand_iff_pairwise_ne [LinearOrder X] (l : List (X × Nat))
-    (hl : List.Chain' Ne (List.map Prod.fst l)) :
+  (hl : List.Chain' Ne (List.map Prod.fst l))
+  (h_nonzero : List.Forall (fun p => p ≠ 0) (l.map Prod.snd)):
     Sticking (expand l) ↔ (l.map Prod.fst).Pairwise Ne := by
   unfold Sticking
   rw [check_stick_eq_destutter]
-  rw [destutter_expand]
+  rw [destutter_expand ]
   exact hl
+  exact h_nonzero
 
-theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst)) :
+theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst))
+  (h_nonzero : List.Forall (fun p => p ≠ 0) (l.map Prod.snd)) :
     countAux' (expand l) = l.map Prod.snd := by
-  sorry
+
+  unfold expand
+  match l with
+  |[] =>
+    unfold countAux'
+    simp
+  | (x , n) :: l =>
+    have h1 :=  List.Chain'.tail h
+    simp at h1
+    simp at h_nonzero
+    have ⟨ n_nonzero, hl⟩ := h_nonzero
+    rw[<-List.forall_map_iff] at hl
+    have induction_hl := countAux'_expand l h1 hl
+    simp
+    unfold countAux'
+    unfold List.Chain' at h
+    simp at h
+    induction n with
+    | zero =>
+      trivial
+    | succ n ih1 =>
+      induction n with
+      | zero =>
+        simp
+        unfold countAux
+        match l with
+        | [] =>
+          simp
+        | (y, m) :: l =>
+          simp
+          simp at hl
+          have hm := Nat.exists_eq_succ_of_ne_zero hl.1
+          obtain ⟨ k, hk⟩ := hm
+          rw[hk]
+          simp
+          simp at h
+          rw[if_neg h.1]
+          simp
+          unfold expand countAux' at induction_hl
+          rw[hk] at induction_hl
+          simp at induction_hl
+          exact induction_hl
+      | succ k _ =>
+        simp at ih1
+        simp
+        rw[<-List.forall_map_iff] at ih1
+        apply ih1 at hl
+        unfold countAux
+        simp
+        exact hl
 
 theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
     expand (List.zip (l.destutter Ne) (countAux' l)) = l := by
-  sorry
+  unfold expand countAux'
+
+  simp
+  match l with
+  | [] =>
+    simp
+  | [a] =>
+    simp
+  | a :: b :: l =>
+    have ih := expand_destutter_countAux' ( b :: l)
+    rw[List.destutter_cons_cons l (Ne)]
+    by_cases h : a = b
+    · rw[h]
+      unfold countAux
+      unfold expand at ih
+      simp at ih
+      simp
+      -- simp
+      sorry
+    · unfold countAux
+      simp
+      rw[if_neg h]
+      rw[if_neg h]
+      dsimp
+      exact congrArg (List.cons a) ih
+
+#check List.destutter_cons_cons [1,2,1] (Ne)
+
+lemma destutter_countAux'_length_eq  [DecidableEq X] (L : List X) :
+    (L.destutter Ne).length = (countAux' L).length := by
+  match L with
+  | [] =>
+    unfold countAux'
+    simp
+  | [a] =>
+    unfold countAux'
+    unfold countAux
+    simp
+  | a :: b :: l =>
+    have := destutter_countAux'_length_eq (b :: l)
+    by_cases h : a = b
+    · rw[h]
+      unfold List.destutter countAux'
+      simp
+      unfold List.destutter countAux' at this
+      simp at this
+      unfold countAux
+      simp
+      exact this
+    · unfold List.destutter countAux' List.destutter'
+      simp
+      rw[if_neg h]
+      simp
+      unfold countAux
+      simp
+      rw[if_neg h]
+      simp
+      unfold List.destutter countAux' at this
+      simp at this
+      exact this
+
+lemma countAux'_non_zero [DecidableEq X] (L : List X) :
+     (countAux' L).Forall (fun p => p ≠ 0):= by
+  match L with
+  | [] =>
+    simp
+  | [a] =>
+    simp
+  | a :: b :: l =>
+    by_cases h : a = b
+    · have ih := countAux'_non_zero ( b :: l)
+      unfold countAux'
+      simp
+      unfold countAux
+      simp
+      rw[if_pos h]
+      simp
+      unfold countAux' at ih
+      simp at ih
+      exact ih.2
+    · have ih := countAux'_non_zero ( b :: l)
+      unfold countAux'
+      simp
+      unfold countAux
+      simp
+      rw[if_neg h]
+      simp
+      unfold countAux' at ih
+      simp at ih
+      exact ih
+
 
 theorem List.exists_eq_expand [DecidableEq X] (L : List X) :
-    ∃ l : List (X × Nat), L = expand l ∧ Chain' Ne (l.map Prod.fst) := by
+    ∃ l : List (X × Nat), L = expand l ∧ Chain' Ne (l.map Prod.fst)
+  ∧ List.Forall (fun p => p ≠ 0) (List.map Prod.snd l) := by
   -- used in expand_destutter_countAux'
-  sorry
+  use List.zip (L.destutter Ne) (countAux' L)
+  constructor
+  · rw[ expand_destutter_countAux' L]
+  · rw[ @List.map_fst_zip X Nat (destutter Ne L) (countAux' L)]
+    · constructor
+      · apply List.destutter_is_chain'
+      · rw[List.map_snd_zip]
+        · apply countAux'_non_zero
+        · rw[destutter_countAux'_length_eq]
+    · rw[destutter_countAux'_length_eq]
 
 -- we think we don't need a side condition here?
 theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
@@ -283,21 +489,39 @@ countAux L = f countAux sort L
 -/
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
-  obtain ⟨l, rfl, hl⟩ := L.exists_eq_expand
+  obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
+  have h_perm : List.Perm (List.mergeSort (fun x x_1 => x.1 < x_1.1) l) l
+  · apply List.perm_mergeSort
   rw [sort_expand l]
   dsimp
   rw [countAux'_expand]
   rw [countAux'_expand]
   · symm
-    -- idea should be in List.perm_mergeSort
-    sorry
+    -- idea should be in
+    -- apply List.perm_mergeSort
+    apply List.Perm.map
+    exact h_perm
   · rw [sticking_expand_iff_pairwise_ne _ hl] at hL
+    apply List.Pairwise.chain'
+    apply List.Pairwise.perm hL
+    · apply List.Perm.map
+      exact id (List.Perm.symm h_perm)
+    · tauto
     -- should follow from these three
     -- List.Pairwise.chain'
     -- List.Pairwise.perm
     -- List.perm_mergeSort
+    exact hne0
+  · simp
+    simp at hne0
     sorry
-  · exact hl
+  exact hl
+  exact hne0
+
+
+#check List.Pairwise.chain'
+#check List.Pairwise.perm
+#check List.perm_mergeSort
 
 lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
     count L = count (List.sort L) := by
@@ -307,11 +531,10 @@ lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
   -- since mergeSort is a permutation of the original list,
   -- LHS and RHS are permutations of each other too
   -- since they are also both sorted they must be the same
+
   sorry
 
-lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
-    List.sort ( List.map f L.sort) = List.sort (List.map f L) := by
-  sorry
+-- #check Tuple.comp_sort_eq_iff_monotone
 
 lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [LinearOrder X]:
     count (List.sort (List.join (List.map (List.map f) L))) = count (List.sort (List.join L)) := by

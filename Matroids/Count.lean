@@ -50,13 +50,13 @@ def countAux : List X → Nat × List Nat
       else
          (1, c :: finishedCount)
 
-def countAux' (l : List X) : List ℕ :=
+def countAux' (l : List X) [DecidableEq X]: List ℕ :=
    let (c, finishedCount) := countAux l
-   (c::finishedCount)
+   if l = [] then [] else (c::finishedCount)
 
 /--It sorts the counted appearance of each element. That way, it is not differentiated by the
 permutations of elements that get counted but rather by the quantity of different elements. -/
-def count (l: List X) : List Nat  := (countAux' l).sort
+def count (l: List X) [DecidableEq X]: List Nat  := (countAux' l).sort
 
 def expand (l : List (X × Nat)) : List X := (l.map fun (x, n) ↦ List.replicate n x).join
 
