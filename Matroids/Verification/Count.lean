@@ -95,6 +95,11 @@ theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} 
     (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
     (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
     f x ≠ f y := by
+  contrapose! h
+  unfold groupByValue at hx hy
+  simp at hx hy
+
+
   sorry
 
 -- this should be a simple consequence of the above but there are BEq issues, skip for now
@@ -104,6 +109,7 @@ theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List
     (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
     (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
     f x ≠ f y := by
+  -- apply ne_of_groupByValue' h hx hy
   sorry
 
 lemma countAux_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):
@@ -216,23 +222,23 @@ lemma empty_stick {L : List X} [LinearOrder X] (hl : L = []):
   simp
 
 
-lemma tail_stick {L : List X} [LinearOrder X] (hl : Sticking L):
-    Sticking L.tail := by
-  unfold List.tail
-  match L with
-  | [] =>
-    simp
-    exact hl
-  | a :: l1 =>
-    simp
-    unfold Sticking at hl
-    unfold check_stick at hl
-    match l1 with
-    | [] =>
-      apply empty_stick
-      simp
-    | b :: l =>
-      sorry
+-- lemma tail_stick {L : List X} [LinearOrder X] (hl : Sticking L):
+--     Sticking L.tail := by
+--   unfold List.tail
+--   match L with
+--   | [] =>
+--     simp
+--     exact hl
+--   | a :: l1 =>
+--     simp
+--     unfold Sticking at hl
+--     unfold check_stick at hl
+--     match l1 with
+--     | [] =>
+--       apply empty_stick
+--       simp
+--     | b :: l =>
+--       sorry
 
 lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → X} (hf: f.Bijective):
     Sticking (L.map f) := by
@@ -393,8 +399,6 @@ theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
       dsimp
       exact congrArg (List.cons a) ih
 
-#check List.destutter_cons_cons [1,2,1] (Ne)
-
 lemma destutter_countAux'_length_eq  [DecidableEq X] (L : List X) :
     (L.destutter Ne).length = (countAux' L).length := by
   match L with
@@ -487,6 +491,10 @@ check_stick l = perm f check_stick L.sort
 and
 countAux L = f countAux sort L
 -/
+
+
+
+
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
   obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
@@ -514,14 +522,11 @@ lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     exact hne0
   · simp
     simp at hne0
-    sorry
+    apply List.Forall.perm h_perm.symm hne0
   exact hl
   exact hne0
 
 
-#check List.Pairwise.chain'
-#check List.Pairwise.perm
-#check List.perm_mergeSort
 
 lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
     count L = count (List.sort L) := by
@@ -531,8 +536,8 @@ lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
   -- since mergeSort is a permutation of the original list,
   -- LHS and RHS are permutations of each other too
   -- since they are also both sorted they must be the same
-
-  sorry
+  apply mergeSort_of_perm_eq
+  exact this
 
 -- #check Tuple.comp_sort_eq_iff_monotone
 
@@ -546,7 +551,3 @@ lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [Li
   -- unfold count
   -- simp [-List.map_join]
   -- congr! 3
-
-#check List.Perm
--- #check List.Subseq
-#check List.tail

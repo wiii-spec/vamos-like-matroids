@@ -132,3 +132,15 @@ theorem List.Sublist.mem {α : Type*} {l₁ : List α} {a : α} {l₂ : List α}
     (hl : l₁.Sublist l₂) :
     a ∈ l₂ :=
   sorry
+
+
+lemma List.Forall.perm {L₁ L₂ :List X} {P : X → Prop } (hL : L₁.Perm L₂)
+    (hp: L₁.Forall P) :
+    L₂.Forall P := by
+  -- apply?
+  sorry
+
+
+lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Prop) [DecidableRel P] (hL : L₁.Perm L₂) :
+    List.mergeSort P L₁ = List.mergeSort P L₂ := by
+  sorry

@@ -139,7 +139,16 @@ lemma groupByBucket_normalized (lA : List PartialMatroid)
     apply hlA
 
 
------prove group by bucket
+
+
+
+-- lemma groupByBucket_mem {lA : List PartialMatroid} {A : PartialMatroid}
+--     (hA : )
+
+
+
+
+-----prove group by bucket_nonisomorphic
 
 
 lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)

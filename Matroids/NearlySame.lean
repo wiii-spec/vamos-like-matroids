@@ -56,3 +56,17 @@ def elimNearlySame (l : List Nat) : List (List Nat) → List (List Nat)
       elimNearlySame l t1
     else
       h1 :: elimNearlySame l t1
+
+
+
+-- assume the list are sorted
+def nsame : List Nat -> List Nat -> Nat
+  | [], b => b.length
+  | a, [] => a.length
+  | i :: a, j :: b =>
+    if i = j then nsame a b
+    else if i > j then 1 + nsame (i :: a) b
+    else 1 + nsame a (j :: b)
+
+def check_nsame : List Nat -> List Nat -> Bool
+  | a, b => ( nsame a b ) ≤ 2

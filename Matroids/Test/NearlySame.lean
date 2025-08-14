@@ -48,27 +48,34 @@ import Std
 /-- info: true -/
 #guard_msgs in
 #eval NearlySame  [1, 5] [1, 2, 5]
+#eval check_nsame  [1, 5] [1, 2, 5]
 
 /-- info: (true, true, true) -/
 #guard_msgs in
 #eval NearlySameAux [1, 2, 5, 7, 9] [1, 2, 3, 5, 9]
+#eval check_nsame [1, 2, 5, 7, 9] [1, 2, 3, 5, 9]
 
 /-- info: true -/
 #guard_msgs in
 #eval NearlySame [1, 2, 5, 7, 9] [1, 2, 3, 5, 9] -- true
+#eval check_nsame [1, 2, 5, 7, 9] [1, 2, 3, 5, 9] -- true
+
 
 /-- info: (false, true, true) -/
 #guard_msgs in
 #eval NearlySameAux [1, 2, 5, 7, 9] [1, 2, 3, 7, 10]
+#eval nsame [1, 2, 5, 7, 9] [1, 2, 3, 7, 10]
 
 /-- info: false -/
 #guard_msgs in
 #eval NearlySame [1, 2, 5, 7, 9] [1, 2, 3, 7, 10] -- false
+#eval check_nsame [1, 2, 5, 7, 9] [1, 2, 3, 7, 10]
 
 
 /-- info: (true, true, true) -/
 #guard_msgs in
 #eval NearlySameAux [1,2,3,5,7] [2,3,5,7,8]
+#eval nsame [1,2,3,5,7] [2,3,5,7,8]
 
 /-- info: true -/
 #guard_msgs in
@@ -77,6 +84,7 @@ import Std
 /-- info: (false, true, true) -/
 #guard_msgs in
 #eval NearlySameAux [1, 2, 3] [1, 4]
+#eval nsame [1, 2, 3] [1, 4]
 
 #eval NearlySame [1, 2, 3] [1, 4] -- can return whatever is convenient -- we don't care about the output on lists of different lengths
 

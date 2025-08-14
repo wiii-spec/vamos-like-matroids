@@ -76,10 +76,17 @@ theorem forall_nonisomorphic_prunedVamos (i : ℕ) :
   intro l hl
   simp at hl
   have ⟨ a, ha, hal⟩ := hl
-  rw[<-hal]
-  apply List.Pairwise.sublist
-  apply mem_pruning a
-  sorry
+  unfold pruning at hal
+  simp at hal
+  induction a with
+  | nil =>
+    simp at hal
+    rw[<- hal]
+    simp
+  | cons h a induction_h =>
+    simp at hal
+    -- apply?
+    sorry
 
 
 
@@ -125,8 +132,20 @@ theorem length_augmentedVamos {i : ℕ} {A : PartialMatroid} {lA' : List Partial
     (hA : A ∈ lA') :
     A.matroid.length = 5 + i := by
   rw [augmentedVamos] at hlA'
-
-  sorry
+  unfold PartialMatroid.augmentationsFinal at hlA'
+  induction i with
+  | zero =>
+    simp at hlA'
+    unfold PartialMatroid.groupByBucket at hlA'
+    simp at hlA'
+    unfold PartialMatroid.groupByThirdInvariant at hlA'
+    simp at hlA'
+    unfold groupByValue at hlA'
+    simp at hlA'
+    sorry
+  | succ n n_ih =>
+    simp at n_ih
+    sorry
 
 
 theorem length_prunedVamos {i : ℕ} {A : PartialMatroid} {lA' : List PartialMatroid}

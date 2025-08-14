@@ -27,7 +27,8 @@ lemma mem_of_mem_pruning {lA : List (PartialMatroid)} {A : PartialMatroid}
       obtain hAA | hAAA := hA
       left
       apply hAA
-      sorry
+      right
+      apply IH hAAA
 
 lemma mem_pruning  (lA : List (PartialMatroid)):
     List.Sublist (pruning lA) lA := by
