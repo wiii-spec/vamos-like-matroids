@@ -76,17 +76,9 @@ theorem forall_nonisomorphic_prunedVamos (i : ℕ) :
   intro l hl
   simp at hl
   have ⟨ a, ha, hal⟩ := hl
-  unfold pruning at hal
-  simp at hal
-  induction a with
-  | nil =>
-    simp at hal
-    rw[<- hal]
-    simp
-  | cons h a induction_h =>
-    simp at hal
-    -- apply?
-    sorry
+  subst hal
+  clear hl ha
+  apply nonisomorphic_pruning
 
 
 

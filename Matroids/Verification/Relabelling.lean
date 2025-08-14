@@ -74,6 +74,26 @@ lemma pruning_normalized (A : List PartialMatroid)
       · exact h_ok
       · exact t_ok
 
+theorem nonisomorphic_pruning {a : List PartialMatroid} :
+    List.Pairwise (fun A₁ A₂ => ¬permutationsComparison 8 A₁.matroid A₂.matroid = true) (pruning a) := by
+  unfold pruning
+  match a with
+  | [] => simp
+  | h :: l =>
+    simp
+    have induct_h := @nonisomorphic_pruning l
+    simp at induct_h
+    split
+    · apply induct_h
+    · split
+      · apply induct_h
+      · case inr.inr ha =>
+        rw [List.pairwise_cons]
+        constructor
+        · simp at ha
+          exact ha
+        · apply induct_h
+
 
 
 
