@@ -2,60 +2,32 @@ import Matroids.NearlySame
 import Matroids.Verification.Basic
 import Matroids.Verification.Miscellaneous
 
-lemma NearlySameAux.comm {l₁ l₂ : List Nat} {a b c : Bool} :
-    NearlySameAux l₁ l₂ = (a, b, c) ↔ NearlySameAux l₂ l₁ = (a, c, b) := by
-  match l₁,l₂ with
-    | [], [] =>
-      simp [NearlySameAux]
-      tauto
-    | [], [_] =>
-      simp [NearlySameAux]
-      tauto
-    | [], _ :: _ :: _ =>
-      simp [NearlySameAux]
-      tauto
-    | [_], [] =>
-      simp [NearlySameAux]
-      tauto
-    | _ :: _ :: _, [] =>
-      simp [NearlySameAux]
-      tauto
-    | h1 :: t1, h2 :: t2 =>
-      simp [NearlySameAux]
-      have IH :
-        NearlySameAux t1 t2 = (a, b, c) ↔ NearlySameAux t2 t1 = (a, c, b) := NearlySameAux.comm
-      split_ifs
-      · apply IH
-      · tauto
-      · tauto
-      · tauto
-      · tauto
-      · tauto
-      · omega
-      · omega
-      · sorry
-      · sorry
-      · tauto
-      · omega
-      · omega
-      · sorry
-      · sorry
-      · tauto
-      · sorry
-      · sorry
-      · omega
-      · omega
-      · tauto
-      · sorry
-      · sorry
-      · omega
-      · omega
+
+lemma nsame.comm {l₁ l₂ : List Nat} :
+    nsame l₁ l₂ = nsame l₂ l₁ := by
+  unfold nsame
+  match l₁, l₂ with
+  |[], [] => simp
+  | [], _ :: l₂' => simp
+  | _ :: l₁', [] => simp
+  | i :: a, j :: b =>
+    simp
+    obtain h | h | h := lt_trichotomy i j
+    · rw [if_neg, if_neg, if_neg, if_pos]
+      have := @nsame.comm a (j :: b)
+      rw[this]
+      all_goals omega
+    · rw[if_pos, if_pos]
+      rw[ @nsame.comm a b]
+      all_goals omega
+    · rw[if_neg, if_pos, if_neg, if_neg]
+      rw[ @nsame.comm (i :: a) b]
+      all_goals omega
+      termination_by _ l1 l2 => l1.length + l2.length
 
 
-lemma NearlySameAux2.comm {l₁ l₂ : List Nat} :
-    let (a, b, c) := NearlySameAux l₁ l₂
-    NearlySameAux l₂ l₁ = (a, c, b) := by sorry
 
-lemma NearlySame.comm {l₁ l₂: List Nat} : NearlySame l₁ l₂ = NearlySame l₂ l₁ := by
+lemma NearlySame.comm {l₁ l₂ : List Nat} :
+    NearlySame l₁ l₂ = NearlySame l₂ l₁ := by
   unfold NearlySame
-  sorry
+  simp_rw[nsame.comm]

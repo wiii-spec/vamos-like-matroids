@@ -14,40 +14,20 @@ lists in the list of lists that has at most one different element between them a
 from the list of lists that have a most one different element between it and the new list.
 -/
 
-/-- Check if two ordered lists of the same length differ by at most one entry. Bool₁ indicates
-if a list can be consider to be NearlySame (aka. the answer we care about). Bool₂ keeps track of if
-the first list hass used its "free pass" to have something different when compared to the second list.
-Finally Bool₃ indicates the same relation but now between the second list and the first list.-/
-def NearlySameAux : List Nat → List Nat → (Bool × Bool × Bool)
-  | [], [] => (true, false, false)
-  | [], [_] => (true, false, true)
-  | [], _ :: _ :: _ => (false, false, true)
-  | [_], [] => (true, true, false)
-  | _ :: _ :: _, [] => (false, true, false)
-  | h1 :: t1, h2 :: t2 =>
-    if h1 = h2 then
-      NearlySameAux t1 t2
-    else
-      if h1 < h2 then
-        let (b, leftFreePassUsed,  rightFreePassUsed) :=
-          NearlySameAux t1 (h2::t2)
-        if (leftFreePassUsed == true) then
-          (false, true, rightFreePassUsed)
-        else
-          (b, true,  rightFreePassUsed)
-      else -- h1 > h2
-        -- use the right free pass
-        let (b, leftFreePassUsed,  rightFreePassUsed) :=
-          NearlySameAux (h1 :: t1) t2
-        if (rightFreePassUsed == true) then
-          (false, leftFreePassUsed, true)
-        else
-          (b, leftFreePassUsed,  true)
 
+
+-- assume the list are sorted
+def nsame : List Nat -> List Nat -> Nat
+  | [], b => b.length
+  | _ :: a, [] => a.length + 1
+  | i :: a, j :: b =>
+    if i = j then nsame a b
+    else if i > j then 1 + nsame (i :: a) b
+    else 1 + nsame a (j :: b)
 
 def NearlySame (l1 : List Nat) (l2 : List Nat) : Bool :=
-  let (a, _, _) := NearlySameAux l1 l2
-  a
+  Nat.ble ( nsame l1 l2 ) 2
+
 
 def elimNearlySame (l : List Nat) : List (List Nat) → List (List Nat)
   | [] => []
@@ -56,17 +36,3 @@ def elimNearlySame (l : List Nat) : List (List Nat) → List (List Nat)
       elimNearlySame l t1
     else
       h1 :: elimNearlySame l t1
-
-
-
--- assume the list are sorted
-def nsame : List Nat -> List Nat -> Nat
-  | [], b => b.length
-  | a, [] => a.length
-  | i :: a, j :: b =>
-    if i = j then nsame a b
-    else if i > j then 1 + nsame (i :: a) b
-    else 1 + nsame a (j :: b)
-
-def check_nsame : List Nat -> List Nat -> Bool
-  | a, b => ( nsame a b ) ≤ 2
