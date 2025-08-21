@@ -1,5 +1,5 @@
-import Mathlib.Data.List.Sort
 import Mathlib.Data.List.Lex
+import Matroids.Sort
 
 variable {X : Type*} [LT X] [DecidableRel ((·:X) < · )] [BEq X ]
 
@@ -30,11 +30,6 @@ connections.
 Shouls be a part of Buckets.lean
 -/
 
-/-- Function that sorts, outside PartialMatroid namespace. It will sort lists by dtermining which
-list is greater. Its criteria for determining the greater list is whichever list generates a greater
-number first-/
-def List.sort {X : Type*} [LinearOrder X] (l : List X) : List X :=
-   l.mergeSort (· < · )
 
 
 /-- Function to count the number of ocurrences of a specific elements in a sorted list. We first

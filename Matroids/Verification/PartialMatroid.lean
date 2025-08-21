@@ -1,6 +1,7 @@
 import Matroids.PartialMatroid
 import Matroids.Verification.Basic
 import Matroids.Verification.Miscellaneous
+import Matroids.Verification.Sort
 import Matroids.Verification.NearlySame
 import Matroids.Vamos
 

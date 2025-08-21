@@ -1,5 +1,6 @@
 import Matroids.Verification.Basic
 import Matroids.Verification.Miscellaneous
+import Matroids.Verification.Sort
 import Matroids.Count
 import Matroids.PartialMatroid
 import Mathlib.Data.List.Destutter
@@ -68,29 +69,6 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
   exact H hA
 
 --
-
-lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
-    List.sort ( List.map f L.sort) = List.sort (List.map f L) := by
-  sorry
-
-lemma sort_join_sort {X :Type} [LinearOrder X] (L : List (List X)) :
-    List.sort (List.join (List.sort L)) = List.sort (List.join (L)) := by
-  match L with
-  |[] => simp
-  |a :: ll =>
-    simp
-    have h := sort_join_sort ll
-    match a with
-    |[] =>
-      simp
-      sorry
-    |c :: l =>
-      sorry
--- proof idea: consider number of occurence in each list, should be the same
-
-lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
-    List.sort (List.join (List.map List.sort L)) = List.sort (List.join (L)) := by
-  sorry
 
 -- TODO generalize codomain of `f` to arbitrary linear order output
 -- apparently some `BEq` bug
