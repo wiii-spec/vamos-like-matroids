@@ -57,7 +57,15 @@ lemma forall_groupByValue (f : α → List ℕ) (A : List α) (hA : A.Forall P) 
   apply forall_groupByValueAux
   exact hA
 
-
+/- If the operation `groupByValue` is performed on a list of objects of type `α`, all of which have
+a certain property `P`, then the objects of type `α`'s in the output list of lists will all have
+poperty `P`.
+(will probably get used for Theorem 1) -/
+lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA : ∀ a ∈ A, P a) :
+    ∀ l ∈ (groupByValue A f), ∀ a ∈ l, P a := by
+  have H := forall_groupByValue (P := P) f A
+  simp [List.forall_iff_forall_mem] at H
+  exact H hA
 
 --
 
@@ -96,10 +104,8 @@ theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} 
     (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
     f x ≠ f y := by
   contrapose! h
-  unfold groupByValue at hx hy
-  simp at hx hy
-
-
+  -- unfold groupByValue at hx hy
+  -- simp at hx hy
   sorry
 
 -- this should be a simple consequence of the above but there are BEq issues, skip for now

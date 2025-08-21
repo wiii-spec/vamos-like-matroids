@@ -98,20 +98,86 @@ lemma List.forall_mergeSort (r : α → α → Prop) [h: DecidableRel r] {l : Li
   apply List.Perm.symm
   apply List.perm_mergeSort
 
-/- Paused for the moment, we will focus on proving sorted_mergeSort for the less than relationship-/
-lemma List.mergeSort_lt_eq_mergeSort_le [PartialOrder α] {l : List α} [DecidableRel ((· : α) < ·)]
-    [DecidableRel ((· : α) ≤ · )]: mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
-  sorry
 
-/--mergeSort with the less than relation has no duplicates-/
+lemma List.split_of_sublist {l : List α} :
+    List.Sublist (l.split).1 l ∧ List.Sublist (l.split).2 l:= by
+  match l with
+  | [] => simp
+  | a :: l =>
+    unfold split
+    simp
+    have ih := @List.split_of_sublist l
+    constructor
+    · apply List.Sublist.cons_cons
+      exact ih.2
+    · apply List.sublist_cons_of_sublist
+      exact ih.1
+
+
+/- Paused for the moment, we will focus on proving sorted_mergeSort for the less than relationship-/
+lemma List.mergeSort_lt_eq_mergeSort_le [LinearOrder α] {l : List α}
+    (h_nodup : l.Nodup):
+    mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
+  match l with
+  | [] => simp
+  | [a] => simp
+  | a :: b :: l =>
+    unfold mergeSort
+    simp
+    have ha1 : List.Sublist (a :: (split l).1) (a :: b :: l) := by
+      apply List.Sublist.cons_cons
+      apply List.sublist_cons_of_sublist
+      apply List.split_of_sublist.1
+    have hb2 : List.Sublist (b :: (split l).2) (a :: b :: l) := by
+      apply List.sublist_cons_of_sublist
+      apply List.Sublist.cons_cons
+      apply List.split_of_sublist.2
+    have ha := List.Nodup.sublist ha1 h_nodup
+    have hb := List.Nodup.sublist hb2 h_nodup
+    -- have iha := List.mergeSort_lt_eq_mergeSort_le ha
+    -- have ihb := List.mergeSort_lt_eq_mergeSort_le hb
+    -- simp_rw[iha,ihb]
+    -- unfold merge
+    -- have : (split l = ((split l).1, (split l).2)) := by simp
+    -- have := perm_split this
+
+    -- simp at h_nodup
+    -- obtain ⟨hab, _, _⟩ := h_nodup
+    -- rw[or_iff_not_and_not] at hab
+    -- simp at hab
+    -- match mergeSort (fun x x_1 => x ≤ x_1) (a :: (split l).1), mergeSort (fun x x_1 => x ≤ x_1) (b :: (split l).2) with
+    -- | [], [] => simp
+    -- | [], l' => simp
+    -- | a :: l, [] => simp
+    -- | (x1 :: l1 as full1), (x2 :: l2 as full2)=>
+    --   simp
+
+    -- conv =>
+    --   lhs
+    --   arg 6
+    --   intro x1 x2 x3 x4
+      -- rw[lt_iff_le_and_ne (a := x1) (b := x3)]
+
+    sorry
+
+#check List.Nodup.sublist
+#check List.split
+#check lt_iff_le_and_ne
+
+/--mergeSort with the less than relation has no duplicates-/ -- Wrong lemma, counterexample below
 lemma List.mergeSort_no_duplicates [PartialOrder α] {l : List α} [DecidableRel ((· : α) < ·)]:
    Nodup (mergeSort (· < ·) l) :=
+
   sorry
+
+#eval mergeSort (· < ·) [1,1,2]
 
 
 theorem List.pairwise_range {R : ℕ → ℕ → Prop} (H : ∀ i j, i < j → R i j) :
     List.Pairwise R (List.range n) := by
-  sorry
+  apply @List.Pairwise.imp Nat (fun a b => a < b) R
+  · apply H
+  · exact pairwise_lt_range n
 
 /- PENDING theorem: If you have two different sorted lists and you run merge on them,
 then the result has to be sorted. Take a look at theorem Sorted.merge-/

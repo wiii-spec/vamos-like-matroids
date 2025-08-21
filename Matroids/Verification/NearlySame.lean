@@ -31,3 +31,19 @@ lemma NearlySame.comm {l₁ l₂ : List Nat} :
     NearlySame l₁ l₂ = NearlySame l₂ l₁ := by
   unfold NearlySame
   simp_rw[nsame.comm]
+
+
+lemma nsame.refl {l : List Nat} :
+    nsame l l = 0 := by
+  unfold nsame
+  match l with
+  |[] => simp
+  | a :: l =>
+    simp
+    exact nsame.refl
+
+lemma NearlySame.refl {l : List Nat} :
+    NearlySame l l := by
+  unfold NearlySame
+  rw [nsame.refl]
+  simp

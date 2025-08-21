@@ -19,6 +19,7 @@ lemma augmentedVamos_lawful (i : ℕ) :
   · apply vamos_remainingOptions_sorted_of_mem
   · apply vamos_remainingOptions_not_nearlySame
 
+
 lemma augmentedVamos_normalized (i : ℕ) :
     (augmentedVamos i).Forall fun L ↦ L.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
   unfold augmentedVamos
@@ -81,8 +82,6 @@ theorem forall_nonisomorphic_prunedVamos (i : ℕ) :
   apply nonisomorphic_pruning
 
 
-
-
 /-- For a natural number `i`, partial matroids `A` and `B` drawn from *different* pruned
 buckets of the `i`-augmentations of the Vamos matroid, then they are different. -/
 theorem forall_forall_nonisomorphic_prunedVamos (i : ℕ) :
@@ -115,7 +114,157 @@ theorem forall_forall_nonisomorphic_prunedVamos (i : ℕ) :
   specialize hl y hy
   exact hl
 
-#check List.Pairwise.imp
+
+-- lemma mem_of_groupByValue
+
+
+lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} {f : PartialMatroid → List ℕ}
+    (h1 : A ∈ lA)
+    (h2 : lA = (groupByValueAux f lB).1 ∨ lA ∈ (groupByValueAux f lB).2) :
+    A ∈ lB := by
+  unfold groupByValueAux at h2
+  match lB with
+  | [] =>
+    simp at h2
+    rw[h2] at h1
+    exact h1
+  | [a] =>
+    simp at h2
+    rw[h2] at h1
+    exact h1
+  | a :: b :: l =>
+    simp at h2
+    split_ifs at h2
+    · simp at h2
+      obtain h2 | h2 := h2
+      subst h2
+      simp at h1
+      obtain h1 | h1 := h1
+      · rw[h1]
+        simp
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
+        · exact h1
+        · left
+          rfl
+      -- ·
+      rw [List.mem_cons]
+      right
+      apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
+      · exact h1
+      · right
+        exact h2
+    · simp at h2
+      obtain h2 | h2 | h2 := h2
+      · subst h2
+        simp at h1
+        rw[h1]
+        simp
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
+        · subst h2
+          exact h1
+        · left
+          rfl
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
+        · exact h1
+        · right
+          exact h2
+
+
+lemma mem_of_groupByValue {A :PartialMatroid} {lA lB: List PartialMatroid} {f : PartialMatroid → List Nat}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  groupByValue lB f) :
+    A ∈ lB := by
+  unfold groupByValue at h2
+  simp at h2
+  exact mem_of_groupByValueAux h1 h2
+
+
+lemma mem_of_groupByFirstInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupByFirstInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupByFirstInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+
+lemma mem_of_groupBySecondInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupBySecondInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupBySecondInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+lemma mem_of_groupByThirdInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupByThirdInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupByThirdInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+
+
+lemma mem_of_groupByBucket {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈ PartialMatroid.groupByBucket lB) :
+    A ∈ lB := by
+    unfold PartialMatroid.groupByBucket at h2
+    rw [List.mem_join] at h2
+    obtain ⟨ l₁, hl1, hla1⟩ := h2
+    rw[List.mem_map] at hl1
+    obtain ⟨ l₂, hl2, hla2⟩ := hl1
+    rw [List.mem_join] at hl2
+    obtain ⟨ l₃ , hl3, hla3⟩ := hl2
+    simp at hl3
+    obtain ⟨ l₄ , hl4, hla4⟩ := hl3
+    rw[<- hla2] at hla1
+    rw[<- hla4] at hla3
+    have := mem_of_groupByThirdInvariant h1 hla1
+    have := mem_of_groupBySecondInvariant this hla3
+    have := mem_of_groupByFirstInvariant this hl4
+    exact this
+
+
+
+
+lemma length_augmentations {A A' : PartialMatroid}
+    (hA: A ∈ PartialMatroid.augmentations A') :
+    A.matroid.length = A'.matroid.length + 1 := by
+  unfold PartialMatroid.augmentations at hA
+  unfold PartialMatroid.augment at hA
+  simp at hA
+  obtain ⟨a, _, ha2⟩ := hA
+  rw[<- ha2]
+  simp
+  unfold List.sort
+  simp
+
+lemma length_augmentationsFinal{n : ℕ} {A A' : PartialMatroid}:
+    A ∈ PartialMatroid.augmentationsFinal n A' -> A.matroid.length = A'.matroid.length + n := by
+  induction n generalizing A A' with
+  | zero =>
+    intro hA
+    unfold PartialMatroid.augmentationsFinal at hA
+    simp at hA
+    rw[ hA]
+    simp
+  | succ n ih =>
+    intro hA
+    unfold PartialMatroid.augmentationsFinal at hA
+    simp at hA
+    obtain ⟨a,ih1,ih2⟩ := hA
+    have ih1 := length_augmentations ih1
+    apply ih at ih2
+    rw[ih1] at ih2
+    omega
 
 
 
@@ -124,20 +273,11 @@ theorem length_augmentedVamos {i : ℕ} {A : PartialMatroid} {lA' : List Partial
     (hA : A ∈ lA') :
     A.matroid.length = 5 + i := by
   rw [augmentedVamos] at hlA'
-  unfold PartialMatroid.augmentationsFinal at hlA'
-  induction i with
-  | zero =>
-    simp at hlA'
-    unfold PartialMatroid.groupByBucket at hlA'
-    simp at hlA'
-    unfold PartialMatroid.groupByThirdInvariant at hlA'
-    simp at hlA'
-    unfold groupByValue at hlA'
-    simp at hlA'
-    sorry
-  | succ n n_ih =>
-    simp at n_ih
-    sorry
+  have := mem_of_groupByBucket hA hlA'
+  apply length_augmentationsFinal at this
+  simp at this
+  omega
+
 
 
 theorem length_prunedVamos {i : ℕ} {A : PartialMatroid} {lA' : List PartialMatroid}
@@ -187,6 +327,12 @@ lemma nonisomorphic_joinedPrunedVamos :
     rw [hBj]
     omega
 
+#print axioms length_prunedVamos
+#print axioms nonisomorphic_of_length
+#print axioms List.forall_iff_forall_mem
+#print axioms forall_forall_nonisomorphic_prunedVamos
+
+
 /-- The main computation produces only `List (List ℕ)` objects which are valid ("lawful") sparse
 paving matroids.
 Informally: Theorem 1 -/
@@ -218,3 +364,6 @@ theorem mainComputation_exhausts {l : List (List ℕ)} (hl₁ : LawfulSparsePavi
     (hl₂ : l.NormalizedVamosLike) :
     ∃ l' ∈ mainComputation, permutationsComparison 8 l l' := by
   sorry
+
+
+#print axioms mainComputation_normalizedVamosLike

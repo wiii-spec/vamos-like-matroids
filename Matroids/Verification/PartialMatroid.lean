@@ -2,6 +2,7 @@ import Matroids.PartialMatroid
 import Matroids.Verification.Basic
 import Matroids.Verification.Miscellaneous
 import Matroids.Verification.NearlySame
+import Matroids.Vamos
 
 open PartialMatroid List
 
@@ -148,10 +149,29 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
     unfold augment
     simp
     unfold sort
+    have h_nodup : Nodup (l :: A.matroid) := by
+        simp
+        constructor
+        · contrapose l_not_nearlySame_as_matroid
+          simp at l_not_nearlySame_as_matroid
+          rw[List.forall_iff_forall_mem]
+          simp
+          use l
+          constructor
+          · exact l_not_nearlySame_as_matroid
+          · exact NearlySame.refl
+        · have h := hA.pairwise_not_nearlySame
+          apply List.Pairwise.nodup at h
+          · exact h
+          · refine { irrefl := ?_ }
+            simp
+            apply NearlySame.refl
+    -- apply List.sorted_mergeSort
     apply List.Sorted.lt_of_le
-    rw [List.mergeSort_lt_eq_mergeSort_le]
-    apply List.sorted_mergeSort
-    apply List.mergeSort_no_duplicates
+    · rw [List.mergeSort_lt_eq_mergeSort_le h_nodup]
+      apply List.sorted_mergeSort
+    · apply List.mergeSort_no_duplicates
+
   pairwise_not_nearlySame := by
     unfold augment
     dsimp
@@ -171,6 +191,10 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
       intro h
       rw[NearlySame.comm]
       apply h
+
+
+#eval LawfulSparsePavingMatroid 8 4 (Vamos).matroid
+#eval LawfulSparsePavingMatroid 8 4 (augment [0,1,2,3] Vamos).matroid
 
 
 

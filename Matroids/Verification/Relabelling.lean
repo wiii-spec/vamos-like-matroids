@@ -95,8 +95,6 @@ theorem nonisomorphic_pruning {a : List PartialMatroid} :
         · apply induct_h
 
 
-
-
 /-- If `A` is a list of `PartialMatroid`s, then when the `pruning` operation is performed, every
 `PartialMatroid` in `A` is isomorphic (up to permutation of 0, 1, 2, ... n - 1) to one of the
 `PartialMatroid`s in the pruned list. -/
@@ -131,12 +129,31 @@ theorem permutationsComparison_mem_pruning_of_mem (A : List PartialMatroid) :
 
 
 
+lemma sort_of_length [LinearOrder X] {A : List X}:
+    (A.sort).length = A.length := by
+  refine (List.Perm.length_eq ?p).symm
+  unfold List.sort
+  exact List.Perm.symm (List.perm_mergeSort (fun x x_1 => x < x_1) A)
+
+lemma map_of_length {A : List α} {g : α → β }:
+    (A.map g).length = A.length := by
+  exact List.length_map A g
+
 theorem foo_sameUpToRelabelling {A B : List (List Nat)} {g : Nat → Nat}
     {h : sameUpToRelabelling A B g} : A.length = B.length := by
   unfold sameUpToRelabelling at h
   simp at h
+  have hA1 := @sort_of_length (List Nat) inferInstance (List.map List.sort A)
+  have hB1 := @sort_of_length (List Nat) inferInstance (List.map List.sort (relabelling B g))
+  rw[map_of_length] at hA1 hB1
+  conv at hB1 =>
+    · rhs
+      unfold relabelling
+      rw[map_of_length]
+  rw[<- hA1, <- hB1]
+  exact congrArg List.length (id h.symm)
+
   -- unfold List.sort at h
-  sorry
 
 theorem length_eq_of_permutationsComparison {A B : List (List Nat)}
     {h : permutationsComparison 8 A B} : A.length = B.length := by
@@ -237,3 +254,6 @@ lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ p
   convert dummy
   rw [badBeq]
   rw [badBeq]
+
+
+#print axioms count_of_relabelling
