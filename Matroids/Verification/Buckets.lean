@@ -203,6 +203,58 @@ partial matroids.
 (will probably get used for Theorem 3) -/
 lemma nonisomorphic_groupByBucket (A : List PartialMatroid) :
     (groupByBucket A).Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid :=
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+
   -- use theorem `nonisomorphic_groupByFirstInvariant` and similar for other invariants
+
   sorry
+
+
+
+
+lemma mem_of_groupByFirstInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupByFirstInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupByFirstInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+
+lemma mem_of_groupBySecondInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupBySecondInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupBySecondInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+lemma mem_of_groupByThirdInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  PartialMatroid.groupByThirdInvariant lB) :
+    A ∈ lB := by
+  unfold PartialMatroid.groupByThirdInvariant at h2
+  have := mem_of_groupByValue h1 h2
+  exact List.reverse_mem_mergeSort _ this
+
+
+
+lemma mem_of_groupByBucket {A :PartialMatroid} {lA lB: List PartialMatroid}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈ PartialMatroid.groupByBucket lB) :
+    A ∈ lB := by
+    unfold PartialMatroid.groupByBucket at h2
+    rw [List.mem_join] at h2
+    obtain ⟨ l₁, hl1, hla1⟩ := h2
+    rw[List.mem_map] at hl1
+    obtain ⟨ l₂, hl2, hla2⟩ := hl1
+    rw [List.mem_join] at hl2
+    obtain ⟨ l₃ , hl3, hla3⟩ := hl2
+    simp at hl3
+    obtain ⟨ l₄ , hl4, hla4⟩ := hl3
+    rw[<- hla2] at hla1
+    rw[<- hla4] at hla3
+    have := mem_of_groupByThirdInvariant h1 hla1
+    have := mem_of_groupBySecondInvariant this hla3
+    have := mem_of_groupByFirstInvariant this hl4
+    exact this

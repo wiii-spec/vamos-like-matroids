@@ -557,3 +557,70 @@ lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [Li
   -- unfold count
   -- simp [-List.map_join]
   -- congr! 3
+
+
+lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} {f : PartialMatroid → List ℕ}
+    (h1 : A ∈ lA)
+    (h2 : lA = (groupByValueAux f lB).1 ∨ lA ∈ (groupByValueAux f lB).2) :
+    A ∈ lB := by
+  unfold groupByValueAux at h2
+  match lB with
+  | [] =>
+    simp at h2
+    rw[h2] at h1
+    exact h1
+  | [a] =>
+    simp at h2
+    rw[h2] at h1
+    exact h1
+  | a :: b :: l =>
+    simp at h2
+    split_ifs at h2
+    · simp at h2
+      obtain h2 | h2 := h2
+      subst h2
+      simp at h1
+      obtain h1 | h1 := h1
+      · rw[h1]
+        simp
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
+        · exact h1
+        · left
+          rfl
+      -- ·
+      rw [List.mem_cons]
+      right
+      apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
+      · exact h1
+      · right
+        exact h2
+    · simp at h2
+      obtain h2 | h2 | h2 := h2
+      · subst h2
+        simp at h1
+        rw[h1]
+        simp
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
+        · subst h2
+          exact h1
+        · left
+          rfl
+      · rw [List.mem_cons]
+        right
+        apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
+        · exact h1
+        · right
+          exact h2
+
+
+lemma mem_of_groupByValue {A :PartialMatroid} {lA lB: List PartialMatroid} {f : PartialMatroid → List Nat}
+    (h1 : A ∈ lA)
+    (h2 : lA ∈  groupByValue lB f) :
+    A ∈ lB := by
+  unfold groupByValue at h2
+  simp at h2
+  exact mem_of_groupByValueAux h1 h2

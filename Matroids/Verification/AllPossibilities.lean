@@ -191,3 +191,35 @@ lemma augmentationsFinal_normalized (i : ℕ) (A : PartialMatroid)
       apply hC at hAR
       apply hAR at hB
       exact hB
+
+
+lemma length_augmentations {A A' : PartialMatroid}
+    (hA: A ∈ PartialMatroid.augmentations A') :
+    A.matroid.length = A'.matroid.length + 1 := by
+  unfold PartialMatroid.augmentations at hA
+  unfold PartialMatroid.augment at hA
+  simp at hA
+  obtain ⟨a, _, ha2⟩ := hA
+  rw[<- ha2]
+  simp
+  unfold List.sort
+  simp
+
+lemma length_augmentationsFinal{n : ℕ} {A A' : PartialMatroid}:
+    A ∈ PartialMatroid.augmentationsFinal n A' -> A.matroid.length = A'.matroid.length + n := by
+  induction n generalizing A A' with
+  | zero =>
+    intro hA
+    unfold PartialMatroid.augmentationsFinal at hA
+    simp at hA
+    rw[ hA]
+    simp
+  | succ n ih =>
+    intro hA
+    unfold PartialMatroid.augmentationsFinal at hA
+    simp at hA
+    obtain ⟨a,ih1,ih2⟩ := hA
+    have ih1 := length_augmentations ih1
+    apply ih at ih2
+    rw[ih1] at ih2
+    omega
