@@ -30,6 +30,7 @@ lemma mem_of_mem_pruning {lA : List (PartialMatroid)} {A : PartialMatroid}
       right
       apply IH hAAA
 
+-- not currently used 2025-08-28
 lemma mem_pruning  (lA : List (PartialMatroid)):
     List.Sublist (pruning lA) lA := by
   sorry
@@ -94,7 +95,7 @@ theorem nonisomorphic_pruning {a : List PartialMatroid} :
           exact ha
         · apply induct_h
 
-
+-- not currently used 2025-08-28, we think that it will be used in theorem 4
 /-- If `A` is a list of `PartialMatroid`s, then when the `pruning` operation is performed, every
 `PartialMatroid` in `A` is isomorphic (up to permutation of 0, 1, 2, ... n - 1) to one of the
 `PartialMatroid`s in the pruned list. -/
