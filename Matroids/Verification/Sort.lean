@@ -155,3 +155,19 @@ lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
 lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Prop) [DecidableRel P] (hL : L₁.Perm L₂) :
     List.mergeSort P L₁ = List.mergeSort P L₂ := by
   sorry
+
+
+/- existing lemma in mathlib-/
+theorem List.mergeSort_perm {α : Type u_1} (l : List α) (le : α → α → Prop) [DecidableRel le]:
+    (l.mergeSort le).Perm l := by
+  sorry
+
+
+lemma mergeSort_sorted_list_X_Nat [LinearOrder X] (l : List (X × Nat)) :
+    (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)).Sorted (fun (x1, _) (x2, _) ↦ x1 ≤ x2) := by sorry
+
+
+
+lemma mergeSort_lt_le_eq_List_X_Nat [LinearOrder X] (l : List (X × Nat)) :
+    l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2) = l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 ≤ x2) := by
+  sorry

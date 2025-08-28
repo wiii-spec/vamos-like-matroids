@@ -614,26 +614,27 @@ lemma perm_expand {l₁ l₂ : List ( X × Nat)} (hl : l₁.Perm l₂) :
   apply hl
 
 
-/- existing lemma in mathlib-/
-theorem List.mergeSort_perm {α : Type u_1} (l : List α) (le : α → α → Prop) [DecidableRel le]:
-    (l.mergeSort le).Perm l := by
-  sorry
-
 -- I (HM) think this can be proved using only `expand`, not `count` or `Sticking` etc
+
+
 theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
-    List.sort (X := X) (expand l) = expand (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)) := by
+    List.sort (X := X) (expand l) = expand (l.mergeSort (fun (x1, _) (x2, _) ↦ x1 < x2)) := by
   simp
-  have : (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)).Sorted (fun (x1, _) (x2, _) ↦ x1 ≤ x2) := by
-   sorry
+  have := mergeSort_sorted_list_X_Nat l
   simp at this
   have lhs_sorted := sorted_expand_sorted this
+  rw[mergeSort_lt_le_eq_List_X_Nat] at lhs_sorted
   unfold List.sort
   have rhs_sorted := (expand l).sorted_mergeSort (α := X) (· ≤ ·)
-  rw[<- List.mergeSort_lt_eq_mergeSort_le'] at rhs_sorted
   have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
   have perm_rhs_lhs := perm_expand this
-  -- apply List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
-  sorry
+  have := List.mergeSort_perm (expand l) (· ≤ · )
+  apply List.Perm.symm at this
+  have perm_rhs_lhs := List.Perm.trans perm_rhs_lhs this
+  have h := List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
+  rw[mergeSort_lt_le_eq_List_X_Nat, List.mergeSort_lt_eq_mergeSort_le']
+  simp
+  rw[h]
 
 -- theorem
 --main difficulty
@@ -644,7 +645,7 @@ and
 countAux L = f countAux sort L
 -/
 
-#check List.eq_of_perm_of_sorted
+#check List.Perm.trans
 
 
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
