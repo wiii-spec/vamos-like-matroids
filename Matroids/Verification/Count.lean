@@ -156,7 +156,7 @@ lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · 
       unfold List.Sorted at h
       simp at h
       refine List.sorted_cons.mpr ?_
-      obtain ⟨h1, h2, h3⟩ := h
+      obtain ⟨_, h2, h3⟩ := h
       unfold List.Sorted
       exact ⟨h2, h3⟩
     have induct_h := check_stick_sorted hbl
@@ -181,10 +181,10 @@ lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · 
           | inl hxb =>
             exact Eq.ge hxb
           | inr hxl =>
-            obtain ⟨ h3, h4 ⟩ := h2
+            obtain ⟨ h3, _ ⟩ := h2
             specialize h3 x hxl
             exact h3
-        obtain ⟨ h_a_le_b, dummy⟩ := h1
+        obtain ⟨ h_a_le_b, _⟩ := h1
         exact lt_of_lt_of_le (lt_of_le_of_ne h_a_le_b hab) hbx
       · rw [← check_stick_eq_destutter] at induct_h
         apply induct_h
@@ -193,10 +193,16 @@ lemma check_stick_sorted {L : List X} [LinearOrder X] (h : L.Sorted ( · ≤ · 
 lemma sort_stick (L : List X) [LinearOrder X]:
     Sticking (L.sort) := by
   unfold Sticking
+  unfold List.sort
+  rw[check_stick_eq_destutter]
+  rw[List.mergeSort_lt_eq_mergeSort_le']
+  have := List.sorted_mergeSort (· ≤ ·) (l := L)
+  have := check_stick_sorted this
+  have hh := @ne_of_lt X inferInstance
+  apply List.Pairwise.imp hh this
   -- have h := check_stick_sorted L
   --probabily need to change L.sort into ≤, because I need to use L.sort (<) is Sorted (≤) here
   --proof is simple, just need syntax to change < to ≠
-  sorry
 
 lemma empty_stick {L : List X} [LinearOrder X] (hl : L = []):
     Sticking L := by
@@ -205,24 +211,65 @@ lemma empty_stick {L : List X} [LinearOrder X] (hl : L = []):
   unfold check_stick
   simp
 
+lemma mem_of_check_stick {α : X }{L : List X} [LinearOrder X] :
+    α ∈ L ↔ α ∈ check_stick L := by
+  unfold check_stick
+  match L with
+  | [] => simp
+  | [a] => simp
+  | a :: b :: l =>
+    have ih := @mem_of_check_stick X α (b :: l) inferInstance
+    by_cases h : a = b
+    · rw[h]
+      simp
+      simp at ih
+      exact ih
+    · simp
+      rw[if_neg h]
+      constructor
+      · intro h
+        obtain h | h | h := h
+        · rw[h]
+          simp
+        · simp
+          right
+          rw[<-ih, h]
+          simp
+        · simp
+          right
+          rw[<-ih]
+          simp
+          right
+          exact h
+      · intro h
+        simp at h
+        obtain h | h := h
+        · rw[h]
+          simp
+        · rw[<- ih] at h
+          simp at h
+          exact Or.inr h
 
--- lemma tail_stick {L : List X} [LinearOrder X] (hl : Sticking L):
---     Sticking L.tail := by
---   unfold List.tail
---   match L with
---   | [] =>
---     simp
---     exact hl
---   | a :: l1 =>
---     simp
---     unfold Sticking at hl
---     unfold check_stick at hl
---     match l1 with
---     | [] =>
---       apply empty_stick
---       simp
---     | b :: l =>
---       sorry
+
+lemma tail_stick {a : X}{L : List X} [LinearOrder X]:
+    Sticking (a :: L) → Sticking L := by
+  intro h
+  unfold Sticking at h
+  unfold check_stick at h
+  match L with
+  |[] =>
+    apply empty_stick
+    simp
+  | b :: l =>
+    by_cases hab : a = b
+    · rw[hab] at h
+      simp at h
+      exact h
+    · simp at h
+      rw[if_neg hab] at h
+      simp at h
+      exact h.2
+
 
 lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → X} (hf: f.Bijective):
     Sticking (L.map f) := by
@@ -235,9 +282,29 @@ lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → 
     simp
   | a :: b :: l =>
     --need b::l sticking, should be simple
-    -- have inductive_hl := map_stick_stick (@tail_stick X (a :: b :: l))
-    sorry
-
+    have hbl := @tail_stick X a ( b :: l) inferInstance hl
+    have inductive_hl := map_stick_stick (L := b :: l) hbl hf
+    unfold Sticking
+    unfold check_stick
+    simp
+    split_ifs with h
+    · exact inductive_hl
+    · simp
+      constructor
+      · unfold Sticking at hl
+        unfold check_stick at hl
+        rw[if_neg] at hl
+        · simp at hl
+          rw[<- mem_of_check_stick]
+          have hl := hl.1
+          rw[<- mem_of_check_stick] at hl
+          change f a ∉ List.map f (b :: l)
+          rw[List.mem_map_of_injective ]
+          exact hl
+          exact Function.Bijective.injective hf
+        · simp
+          exact fun a_1 => h (congrArg f a_1)
+      · exact inductive_hl
 
 -- need additional condition: all element in second list is nonzero (h_nonzero)
 theorem destutter_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst))
@@ -301,6 +368,9 @@ theorem sticking_expand_iff_pairwise_ne [LinearOrder X] (l : List (X × Nat))
   exact hl
   exact h_nonzero
 
+
+
+
 theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' Ne (l.map Prod.fst))
   (h_nonzero : List.Forall (fun p => p ≠ 0) (l.map Prod.snd)) :
     countAux' (expand l) = l.map Prod.snd := by
@@ -355,15 +425,46 @@ theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' 
         simp
         exact hl
 
+lemma expand_add_one [DecidableEq X]{a : X} {n : Nat} {l : List (X × Nat) }:
+    expand ((a,n + 1) :: l) = a :: expand ((a,n) :: l) := by
+  unfold expand
+  unfold List.replicate
+  simp
+  match n with
+  | 0 => simp
+  | n + 1 => simp
+
+
+lemma mem_destutter' (R : X → X → Prop) [DecidableRel R] (l : List X) (b : X):
+    ∃ m : List X, List.destutter' R b l = b :: m := by
+  match l with
+  | [] => simp
+  | a :: l =>
+    unfold List.destutter'
+    by_cases h :R b a
+    · rw[if_pos h]
+      simp
+    · rw[if_neg h]
+      have ih := mem_destutter' R l b
+      exact ih
+
+
+lemma destuttter_destutter' (R : X → X → Prop) [DecidableRel R] (l : List X) (b : X) :
+    List.destutter R ( b :: l) = List.destutter' R b l := by
+  unfold List.destutter
+  simp
+
 theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
     expand (List.zip (l.destutter Ne) (countAux' l)) = l := by
-  unfold expand countAux'
+  unfold countAux'
 
   simp
   match l with
   | [] =>
+    unfold expand
     simp
   | [a] =>
+    unfold expand
     simp
   | a :: b :: l =>
     have ih := expand_destutter_countAux' ( b :: l)
@@ -371,11 +472,17 @@ theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
     by_cases h : a = b
     · rw[h]
       unfold countAux
-      unfold expand at ih
+      unfold countAux' at ih
       simp at ih
       simp
-      -- simp
-      sorry
+      rw[destuttter_destutter'] at ih
+      have h := mem_destutter' Ne l b
+      obtain ⟨ m, hm⟩ := h
+      rw[hm]
+      rw[hm] at ih
+      simp
+      simp at ih
+      rw[ expand_add_one, ih]
     · unfold countAux
       simp
       rw[if_neg h]
@@ -421,7 +528,7 @@ lemma countAux'_non_zero [DecidableEq X] (L : List X) :
   match L with
   | [] =>
     simp
-  | [a] =>
+  | [_] =>
     simp
   | a :: b :: l =>
     by_cases h : a = b
@@ -463,8 +570,69 @@ theorem List.exists_eq_expand [DecidableEq X] (L : List X) :
     · rw[destutter_countAux'_length_eq]
 
 -- we think we don't need a side condition here?
+
+
+lemma sorted_expand_sorted [LinearOrder X] {l : List (X × Nat)} (l_sorted : l.Sorted (fun (x1, _) (x2, _) ↦ x1 ≤ x2)):
+    (expand l).Sorted (· ≤ ·):= by
+  match l with
+  | [] =>
+    unfold expand
+    simp
+  | (a, n) :: l =>
+    unfold List.Sorted at l_sorted
+    simp at l_sorted
+    have ih1 := sorted_expand_sorted l_sorted.2
+    unfold expand
+    simp
+    induction n with
+    | zero =>
+      simp
+      exact ih1
+    | succ n ih2 =>
+      simp
+      constructor
+      · intro b hb
+        obtain hb | hb := hb
+        · rw[List.mem_replicate] at hb
+          rw[hb.2]
+        · obtain ⟨ l₁, hl₁, hbl₁⟩ := hb
+          obtain ⟨ c, m, hcm ⟩ := hl₁
+          have l_sorted := l_sorted.1
+          specialize l_sorted c m hcm.1
+          rw[<- hcm.2] at hbl₁
+          rw[List.mem_replicate] at hbl₁
+          rw[<- hbl₁.2] at l_sorted
+          exact l_sorted
+      exact ih2
+
+
+lemma perm_expand {l₁ l₂ : List ( X × Nat)} (hl : l₁.Perm l₂) :
+    (expand l₁).Perm (expand l₂) := by
+  unfold expand
+  apply List.Perm.join
+  apply List.Perm.map
+  apply hl
+
+
+/- existing lemma in mathlib-/
+theorem List.mergeSort_perm {α : Type u_1} (l : List α) (le : α → α → Prop) [DecidableRel le]:
+    (l.mergeSort le).Perm l := by
+  sorry
+
+-- I (HM) think this can be proved using only `expand`, not `count` or `Sticking` etc
 theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
-    List.sort (X := X) (expand L) = expand (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)) := by
+    List.sort (X := X) (expand l) = expand (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)) := by
+  simp
+  have : (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 < x2)).Sorted (fun (x1, _) (x2, _) ↦ x1 ≤ x2) := by
+   sorry
+  simp at this
+  have lhs_sorted := sorted_expand_sorted this
+  unfold List.sort
+  have rhs_sorted := (expand l).sorted_mergeSort (α := X) (· ≤ ·)
+  rw[<- List.mergeSort_lt_eq_mergeSort_le'] at rhs_sorted
+  have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
+  have perm_rhs_lhs := perm_expand this
+  -- apply List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
   sorry
 
 -- theorem
@@ -476,7 +644,7 @@ and
 countAux L = f countAux sort L
 -/
 
-
+#check List.eq_of_perm_of_sorted
 
 
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :

@@ -76,6 +76,10 @@ lemma List.mergeSort_lt_eq_mergeSort_le [LinearOrder α] {l : List α}
 
     sorry
 
+lemma List.mergeSort_lt_eq_mergeSort_le' [LinearOrder α] {l : List α}:
+    mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
+  sorry
+
 
 lemma List.mem_mergeSort (r : α → α → Prop) [h: DecidableRel r] {l : List α} (h : a ∈ l) :
     a ∈ l.mergeSort r := by
