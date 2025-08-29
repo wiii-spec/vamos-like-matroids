@@ -343,16 +343,17 @@ theorem destutter_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' 
           obtain ⟨ k, hk⟩ := hm
           rw[hk]
           simp
+          show dite _ _ _ = _
           simp at h
-          rw[if_neg h.1]
+          rw[dif_neg h.1]
           simp
           unfold expand List.destutter at induction_hl
           rw[hk] at induction_hl
           simp at induction_hl
           exact induction_hl
       | succ k _ =>
-        simp at ih1
-        simp
+        simp [List.replicate_succ] at ih1
+        simp [List.replicate_succ]
         rw[<-List.forall_map_iff] at ih1
         exact ih1 hl
 
@@ -409,6 +410,8 @@ theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' 
           obtain ⟨ k, hk⟩ := hm
           rw[hk]
           simp
+          show Prod.fst (ite _ _ _) = _ ∧ Prod.snd (ite _ _ _) = _
+          simp
           simp at h
           rw[if_neg h.1]
           simp
@@ -423,6 +426,8 @@ theorem countAux'_expand [DecidableEq X] (l : List (X × Nat)) (h : List.Chain' 
         apply ih1 at hl
         unfold countAux
         simp
+        show Prod.fst (ite _ _ _) = _ ∧ Prod.snd (ite _ _ _) = _
+        simp
         exact hl
 
 lemma expand_add_one [DecidableEq X]{a : X} {n : Nat} {l : List (X × Nat) }:
@@ -432,7 +437,7 @@ lemma expand_add_one [DecidableEq X]{a : X} {n : Nat} {l : List (X × Nat) }:
   simp
   match n with
   | 0 => simp
-  | n + 1 => simp
+  | n + 1 => simp [List.replicate_succ]
 
 
 lemma mem_destutter' (R : X → X → Prop) [DecidableRel R] (l : List X) (b : X):
@@ -465,7 +470,7 @@ theorem expand_destutter_countAux' [DecidableEq X] (l : List X) :
     simp
   | [a] =>
     unfold expand
-    simp
+    simp [countAux]
   | a :: b :: l =>
     have ih := expand_destutter_countAux' ( b :: l)
     rw[List.destutter_cons_cons l (Ne)]
@@ -589,12 +594,11 @@ lemma sorted_expand_sorted [LinearOrder X] {l : List (X × Nat)} (l_sorted : l.S
       simp
       exact ih1
     | succ n ih2 =>
-      simp
+      simp [List.replicate_succ]
       constructor
       · intro b hb
         obtain hb | hb := hb
-        · rw[List.mem_replicate] at hb
-          rw[hb.2]
+        · rw[hb.2]
         · obtain ⟨ l₁, hl₁, hbl₁⟩ := hb
           obtain ⟨ c, m, hcm ⟩ := hl₁
           have l_sorted := l_sorted.1
