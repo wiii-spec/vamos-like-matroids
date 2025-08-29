@@ -28,7 +28,8 @@ lemma nsame.comm {l₁ l₂ : List Nat} :
 
 lemma NearlySame.comm {l₁ l₂ : List Nat} :
     NearlySame l₁ l₂ = NearlySame l₂ l₁ := by
-  unfold NearlySame
+  rw [nearlySame_eq]
+  rw [nearlySame_eq]
   simp_rw[nsame.comm]
 
 
@@ -43,6 +44,6 @@ lemma nsame.refl {l : List Nat} :
 
 lemma NearlySame.refl {l : List Nat} :
     NearlySame l l := by
-  unfold NearlySame
+  rw [nearlySame_eq]
   rw [nsame.refl]
   simp

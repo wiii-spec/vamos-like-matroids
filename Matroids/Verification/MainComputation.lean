@@ -146,8 +146,6 @@ theorem length_prunedVamos {i : ℕ} {A : PartialMatroid} {lA' : List PartialMat
   apply mem_of_mem_pruning
   apply hA
 
-
-#print axioms length_prunedVamos
 /- to prove this, need some lemmas about being non-isomorphic in different situations
   * after applying `pruning`, everything in a list is non-isomorphic
   * after applying `groupByBucket`, everything in different buckets is non-isomorphic
@@ -181,9 +179,19 @@ lemma nonisomorphic_flattenedPrunedVamos :
     rw [hBj]
     omega
 
+/-- info: 'length_prunedVamos' depends on axioms: [propext, Quot.sound] -/
+#guard_msgs in
 #print axioms length_prunedVamos
+
+/-- info: 'nonisomorphic_of_length' depends on axioms: [propext, Quot.sound] -/
+#guard_msgs in
 #print axioms nonisomorphic_of_length
+
+/-- info: 'List.forall_iff_forall_mem' depends on axioms: [propext] -/
+#guard_msgs in
 #print axioms List.forall_iff_forall_mem
+
+-- not done yet
 #print axioms forall_forall_nonisomorphic_prunedVamos
 
 
@@ -195,12 +203,23 @@ theorem mainComputation_lawful : mainComputation.Forall (LawfulSparsePavingMatro
   rw [List.forall_map_iff]
   apply flattenedPrunedVamos_lawful
 
+/-- info: 'mainComputation_lawful' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms mainComputation_lawful
+
+
 /-- The main computation produces only `List (List ℕ)` objects which are "normalized Vámos-like".
 Informally: Theorem 2 -/
 theorem mainComputation_normalizedVamosLike: mainComputation.Forall List.NormalizedVamosLike := by
   unfold mainComputation
   rw [List.forall_map_iff]
   apply flattenedPrunedVamos_normalized
+
+/--
+info: 'mainComputation_normalizedVamosLike' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms mainComputation_normalizedVamosLike
 
 /-- The list of `List (List ℕ)` objects provided by the main computation are mutually
 non-isomorphic (up to permutation of 0, 1, 2, ... 7).
@@ -218,6 +237,3 @@ theorem mainComputation_exhausts {l : List (List ℕ)} (hl₁ : LawfulSparsePavi
     (hl₂ : l.NormalizedVamosLike) :
     ∃ l' ∈ mainComputation, permutationsComparison 8 l l' := by
   sorry
-
-
-#print axioms mainComputation_normalizedVamosLike
