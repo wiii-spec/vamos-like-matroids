@@ -7,48 +7,46 @@ open List
 
 /--mergeSort with the less than relation has no duplicates-/ -- Wrong lemma, counterexample below
 lemma List.mergeSort_no_duplicates [PartialOrder α] {l : List α} [DecidableRel ((· : α) < ·)]:
-   Nodup (mergeSort (· < ·) l) :=
+   Nodup (mergeSort l (· < ·)) :=
 
   sorry
 
-#eval mergeSort (· < ·) [1,1,2]
 
 
-
-lemma List.split_of_sublist {α : Type*} {l : List α} :
-    List.Sublist (l.split).1 l ∧ List.Sublist (l.split).2 l:= by
-  match l with
-  | [] => simp
-  | a :: l =>
-    unfold split
-    simp
-    have ih := List.split_of_sublist (l := l)
-    constructor
-    · exact ih.2
-    · apply List.sublist_cons_of_sublist
-      exact ih.1
+-- lemma List.split_of_sublist {α : Type*} {l : List α} :
+--     List.Sublist (l.split).1 l ∧ List.Sublist (l.split).2 l:= by
+--   match l with
+--   | [] => simp
+--   | a :: l =>
+--     unfold split
+--     simp
+--     have ih := List.split_of_sublist (l := l)
+--     constructor
+--     · exact ih.2
+--     · apply List.sublist_cons_of_sublist
+--       exact ih.1
 
 
 /- Paused for the moment, we will focus on proving sorted_mergeSort for the less than relationship-/
 lemma List.mergeSort_lt_eq_mergeSort_le [LinearOrder α] {l : List α}
     (h_nodup : l.Nodup):
-    mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
+    mergeSort l (· < ·) = mergeSort l (· ≤ ·)  := by
   match l with
   | [] => simp
   | [a] => simp
   | a :: b :: l =>
     unfold mergeSort
     simp
-    have ha1 : List.Sublist (a :: (split l).1) (a :: b :: l) := by
-      apply List.Sublist.cons_cons
-      apply List.sublist_cons_of_sublist
-      apply List.split_of_sublist.1
-    have hb2 : List.Sublist (b :: (split l).2) (a :: b :: l) := by
-      apply List.sublist_cons_of_sublist
-      apply List.Sublist.cons_cons
-      apply List.split_of_sublist.2
-    have ha := List.Nodup.sublist ha1 h_nodup
-    have hb := List.Nodup.sublist hb2 h_nodup
+    -- have ha1 : List.Sublist (a :: (split l).1) (a :: b :: l) := by
+    --   apply List.Sublist.cons_cons
+    --   apply List.sublist_cons_of_sublist
+    --   apply List.split_of_sublist.1
+    -- have hb2 : List.Sublist (b :: (split l).2) (a :: b :: l) := by
+    --   apply List.sublist_cons_of_sublist
+    --   apply List.Sublist.cons_cons
+    --   apply List.split_of_sublist.2
+    -- have ha := List.Nodup.sublist ha1 h_nodup
+    -- have hb := List.Nodup.sublist hb2 h_nodup
     -- have iha := List.mergeSort_lt_eq_mergeSort_le ha
     -- have ihb := List.mergeSort_lt_eq_mergeSort_le hb
     -- simp_rw[iha,ihb]
@@ -76,7 +74,7 @@ lemma List.mergeSort_lt_eq_mergeSort_le [LinearOrder α] {l : List α}
     sorry
 
 lemma List.mergeSort_lt_eq_mergeSort_le' [LinearOrder α] {l : List α}:
-    mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
+    mergeSort l (· < ·) = mergeSort l (· ≤ ·) := by
   sorry
 
 lemma List.not_mem_mergeSort (r : α → α → Bool) {l : List α} (h : a ∉ l) :
@@ -108,7 +106,7 @@ then the result has to be sorted. Take a look at theorem Sorted.merge-/
 
 
 theorem sorted_mergeSort_lt [PartialOrder α] {l : List α} [DecidableRel ((· : α) < ·)] :
-    ∀ l : List α, Sorted (· < ·) (mergeSort (· < ·) l)
+    ∀ l : List α, Sorted (· < ·) (mergeSort l (· < ·))
   | [] => by simp [mergeSort]
   | [a] => by simp [mergeSort]
   | a :: b :: l => by
@@ -143,7 +141,7 @@ lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
 
 
 lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Bool) (hL : L₁.Perm L₂) :
-    List.mergeSort P L₁ = List.mergeSort P L₂ := by
+    List.mergeSort L₁ P = List.mergeSort L₂ P := by
   sorry
 
 

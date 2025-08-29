@@ -46,7 +46,7 @@ lemma List.forall_append_iff {L1 L2 : List α} {P : α → Prop} :
 
 lemma List.Forall.join {L : List (List α)} {P : α → Prop} (hl : L.Forall fun l ↦ l.Forall P) :
     L.join.Forall P := by
-  unfold join
+  unfold List.join
   match L with
   | []      => simp [join]
   | a :: as =>
@@ -63,9 +63,6 @@ lemma List.Forall.join {L : List (List α)} {P : α → Prop} (hl : L.Forall fun
     constructor
     · exact th1
     · exact h1
-#check List.Nodup.sublist
-#check List.split
-#check lt_iff_le_and_ne
 
 theorem List.pairwise_range {R : ℕ → ℕ → Prop} (H : ∀ i j, i < j → R i j) :
     List.Pairwise R (List.range n) := by

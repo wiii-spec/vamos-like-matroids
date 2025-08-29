@@ -634,9 +634,9 @@ theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
   rw[mergeSort_lt_le_eq_List_X_Nat] at lhs_sorted
   unfold List.sort
   have rhs_sorted := (expand l).sorted_mergeSort'' (α := X) (· ≤ ·)
-  have  := List.mergeSort_perm (fun x x_1 => x.1 ≤ x_1.1) l
+  have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
   have perm_rhs_lhs := perm_expand this
-  have := List.mergeSort_perm (· ≤ · ) (expand l)
+  have := List.mergeSort_perm (expand l) (· ≤ · )
   apply List.Perm.symm at this
   have perm_rhs_lhs := List.Perm.trans perm_rhs_lhs this
   have h := List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
@@ -659,7 +659,7 @@ countAux L = f countAux sort L
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
   obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
-  have h_perm : List.Perm (List.mergeSort (fun x x_1 => x.1 < x_1.1) l) l := by
+  have h_perm : List.Perm (List.mergeSort l (fun x x_1 => x.1 < x_1.1)) l := by
     apply List.mergeSort_perm
   rw [sort_expand l]
   dsimp
