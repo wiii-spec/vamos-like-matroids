@@ -151,7 +151,7 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
     unfold augment
     simp
     unfold sort
-    apply (sorted_mergeSort' (l :: A.matroid)).lt_of_le
+    apply (sorted_mergeSort' _ (l :: A.matroid)).lt_of_le
     apply (mergeSort_perm ..).symm.nodup
     simp
     constructor

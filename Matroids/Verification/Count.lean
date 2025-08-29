@@ -195,7 +195,7 @@ lemma sort_stick (L : List X) [LinearOrder X]:
   unfold Sticking
   unfold List.sort
   rw[check_stick_eq_destutter]
-  have := List.sorted_mergeSort' (l := L)
+  have := List.sorted_mergeSort' (l := L) (r := LE.le)
   have := check_stick_sorted this
   have hh := @ne_of_lt X inferInstance
   apply List.Pairwise.imp hh this
@@ -631,7 +631,7 @@ theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
   simp at this
   have lhs_sorted := sorted_expand_sorted this
   unfold List.sort
-  have rhs_sorted := (expand l).sorted_mergeSort' (α := X)
+  have rhs_sorted := (expand l).sorted_mergeSort' (α := X) (r := LE.le)
   have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
   have perm_rhs_lhs := perm_expand this
   have := List.mergeSort_perm (expand l) (· ≤ · )
