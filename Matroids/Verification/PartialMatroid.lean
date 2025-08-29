@@ -36,7 +36,7 @@ it is true that Pᵢⱼ is in l, except for ij = 23
 etc
 are ruled out)
 -/
-lemma augment_normalized (l : List Nat) (A : PartialMatroid)
+lemma augment_vamosLike (l : List Nat) (A : PartialMatroid)
     (hA : List.NormalizedVamosLike A.matroid)
     (hL : ¬ l = ([4,5,6,7])) :
     List.NormalizedVamosLike (augment l A).matroid := by

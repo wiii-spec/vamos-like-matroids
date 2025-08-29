@@ -74,7 +74,7 @@ lemma groupByBucket_lawful (lA : List PartialMatroid)
   apply groupByFirstInvariant_lawful
   apply hA
 
-lemma groupByFirstInvariant_normalized (lA : List PartialMatroid)
+lemma groupByFirstInvariant_vamosLike (lA : List PartialMatroid)
     (hlA : lA.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (groupByFirstInvariant lA).Forall
     (fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) := by
@@ -84,7 +84,7 @@ lemma groupByFirstInvariant_normalized (lA : List PartialMatroid)
    apply hlA
 
 
-lemma groupBySecondInvariant_normalized (llA : List (List PartialMatroid))
+lemma groupBySecondInvariant_vamosLike (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (llA.map groupBySecondInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
@@ -106,7 +106,7 @@ lemma groupBySecondInvariant_normalized (llA : List (List PartialMatroid))
   apply hlB1 at hC
   apply hC
 
-lemma groupByThirdInvariant_normalized (llA : List (List PartialMatroid))
+lemma groupByThirdInvariant_vamosLike (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (llA.map groupByThirdInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
@@ -128,14 +128,14 @@ lemma groupByThirdInvariant_normalized (llA : List (List PartialMatroid))
   apply hlB1 at hC
   apply hC
 
-lemma groupByBucket_normalized (lA : List PartialMatroid)
+lemma groupByBucket_vamosLike (lA : List PartialMatroid)
     (hlA : lA.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (groupByBucket lA).Forall
     (fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) := by
     unfold groupByBucket
-    apply groupByThirdInvariant_normalized
-    apply groupBySecondInvariant_normalized
-    apply groupByFirstInvariant_normalized
+    apply groupByThirdInvariant_vamosLike
+    apply groupBySecondInvariant_vamosLike
+    apply groupByFirstInvariant_vamosLike
     apply hlA
 
 

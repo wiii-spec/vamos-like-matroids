@@ -134,7 +134,7 @@ lemma augmentationsFinal_lawful (i : ℕ) (M : PartialMatroid)
       apply hB
 
 
-lemma augmentations_normalized (A : PartialMatroid)
+lemma augmentations_vamosLike (A : PartialMatroid)
     (hAM : NormalizedVamosLike A.matroid)
     (hAR : ¬[4, 5, 6, 7] ∈ A.remainingOptions):
     (augmentations A).Forall (fun A' ↦ NormalizedVamosLike A'.matroid) := by
@@ -143,7 +143,7 @@ lemma augmentations_normalized (A : PartialMatroid)
   rw [List.forall_iff_forall_mem]
   intro l hl
   simp
-  apply augment_normalized
+  apply augment_vamosLike
   · apply hAM
   · intro h
     rw [h] at hl
@@ -164,7 +164,7 @@ lemma augmentations_remainingOptions_not_mem (A : PartialMatroid)
   contradiction
 
 
-lemma augmentationsFinal_normalized (i : ℕ) (A : PartialMatroid)
+lemma augmentationsFinal_vamosLike (i : ℕ) (A : PartialMatroid)
     (hAM : NormalizedVamosLike A.matroid)
     (hAR : ¬[4, 5, 6, 7] ∈ A.remainingOptions):
     (augmentationsFinal i A).Forall (fun A' ↦ NormalizedVamosLike A'.matroid) := by
@@ -177,9 +177,9 @@ lemma augmentationsFinal_normalized (i : ℕ) (A : PartialMatroid)
     -- let `B` be a matroid in the augmentations list of `A`
     intro B hB
     -- inductive hypothesis: use the same result for `k` in this `k + 1` step
-    apply augmentationsFinal_normalized
+    apply augmentationsFinal_vamosLike
     · -- proof that `B` is still a `LawfulSparsePavingMatroid`
-      have hC := augmentations_normalized A
+      have hC := augmentations_vamosLike A
       apply hC at hAM
       apply hAM at hAR
       rw [List.forall_iff_forall_mem] at hAR

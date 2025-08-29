@@ -20,12 +20,12 @@ lemma augmentedVamos_lawful (i : ℕ) :
   · apply vamos_remainingOptions_not_nearlySame
 
 
-lemma augmentedVamos_normalized (i : ℕ) :
+lemma augmentedVamos_vamosLike (i : ℕ) :
     (augmentedVamos i).Forall fun L ↦ L.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
   unfold augmentedVamos
-  apply groupByBucket_normalized
-  apply augmentationsFinal_normalized
-  · apply vamos_normalized
+  apply groupByBucket_vamosLike
+  apply augmentationsFinal_vamosLike
+  · apply vamos_vamosLike
   · apply vamos_remainingOptions_does_not_contain
 
 lemma prunedVamos_lawful (i : ℕ) :
@@ -35,12 +35,12 @@ lemma prunedVamos_lawful (i : ℕ) :
   apply List.Forall.imp pruning_lawful
   apply augmentedVamos_lawful
 
-lemma prunedVamos_normalized (i : ℕ) :
+lemma prunedVamos_vamosLike (i : ℕ) :
     (prunedVamos i).Forall fun L ↦ L.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
   rw [prunedVamos_def]
   rw [List.forall_map_iff]
-  apply List.Forall.imp pruning_normalized
-  apply augmentedVamos_normalized
+  apply List.Forall.imp pruning_vamosLike
+  apply augmentedVamos_vamosLike
 
 lemma flattenedPrunedVamos_lawful :
     flattenedPrunedVamos.Forall fun M ↦ LawfulSparsePavingMatroid 8 4 M.matroid := by
@@ -52,7 +52,7 @@ lemma flattenedPrunedVamos_lawful :
   apply List.Forall.flatten
   apply prunedVamos_lawful
 
-lemma flattenedPrunedVamos_normalized :
+lemma flattenedPrunedVamos_vamosLike :
     flattenedPrunedVamos.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
   unfold flattenedPrunedVamos
   apply List.Forall.flatten
@@ -60,7 +60,7 @@ lemma flattenedPrunedVamos_normalized :
   rw [List.forall_iff_forall_mem]
   intro i _
   apply List.Forall.flatten
-  apply prunedVamos_normalized
+  apply prunedVamos_vamosLike
 
 
 /-- In each of the pruned "buckets", `l`, in the list of `i`-augmentations of the Vamos matroid,
@@ -210,16 +210,16 @@ theorem mainComputation_lawful : mainComputation.Forall (LawfulSparsePavingMatro
 
 /-- The main computation produces only `List (List ℕ)` objects which are "normalized Vámos-like".
 Informally: Theorem 2 -/
-theorem mainComputation_normalizedVamosLike: mainComputation.Forall List.NormalizedVamosLike := by
+theorem mainComputation_vamosLike: mainComputation.Forall List.NormalizedVamosLike := by
   unfold mainComputation
   rw [List.forall_map_iff]
-  apply flattenedPrunedVamos_normalized
+  apply flattenedPrunedVamos_vamosLike
 
 /--
-info: 'mainComputation_normalizedVamosLike' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: 'mainComputation_vamosLike' depends on axioms: [propext, Classical.choice, Quot.sound]
 -/
 #guard_msgs in
-#print axioms mainComputation_normalizedVamosLike
+#print axioms mainComputation_vamosLike
 
 /-- The list of `List (List ℕ)` objects provided by the main computation are mutually
 non-isomorphic (up to permutation of 0, 1, 2, ... 7).

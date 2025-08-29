@@ -57,7 +57,7 @@ lemma pruning_lawful (lA : List PartialMatroid)
       · exact t_ok
 
 
-lemma pruning_normalized (A : List PartialMatroid)
+lemma pruning_vamosLike (A : List PartialMatroid)
     (hA : A.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (pruning A).Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
   induction A with
