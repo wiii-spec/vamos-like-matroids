@@ -535,9 +535,9 @@ lemma countAux'_non_zero [DecidableEq X] (L : List X) :
      (countAux' L).Forall (fun p => p ≠ 0):= by
   match L with
   | [] =>
-    simp
+    simp [countAux']
   | [_] =>
-    simp
+    simp [countAux', countAux]
   | a :: b :: l =>
     by_cases h : a = b
     · have ih := countAux'_non_zero ( b :: l)

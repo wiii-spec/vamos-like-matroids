@@ -80,7 +80,7 @@ lemma augmentationsFinal_lawful (i : ℕ) (M : PartialMatroid)
       M.matroid.Forall fun l₁ ↦ M.remainingOptions.Forall fun l₂ ↦ ¬ NearlySame l₁ l₂) :
     (augmentationsFinal i M).Forall (fun M' ↦ LawfulSparsePavingMatroid n r M'.matroid) := by
   match i with
-  | 0 => simp [hM]
+  | 0 => simp [hM, augmentationsFinal]
   | k + 1 =>
     apply List.Forall.flatten
     rw [List.forall_map_iff]
@@ -169,7 +169,7 @@ lemma augmentationsFinal_normalized (i : ℕ) (A : PartialMatroid)
     (hAR : ¬[4, 5, 6, 7] ∈ A.remainingOptions):
     (augmentationsFinal i A).Forall (fun A' ↦ NormalizedVamosLike A'.matroid) := by
   match i with
-  | 0 => simp [hAM]
+  | 0 => simp [hAM, augmentationsFinal]
   | j + 1 =>
     apply List.Forall.flatten
     rw [List.forall_map_iff]

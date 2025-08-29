@@ -42,7 +42,7 @@ lemma pruning_lawful (lA : List PartialMatroid)
     (hA : lA.Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid)) :
     (pruning lA).Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid) := by
   induction lA with
-  | nil => simp
+  | nil => simp [pruning]
   | cons h t IH =>
     simp at hA
     obtain ⟨h_ok, t_ok⟩ := hA
@@ -61,7 +61,7 @@ lemma pruning_normalized (A : List PartialMatroid)
     (hA : A.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
     (pruning A).Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
   induction A with
-  | nil => simp
+  | nil => simp [pruning]
   | cons h t IH =>
     simp at hA
     obtain ⟨h_ok, t_ok⟩ := hA
