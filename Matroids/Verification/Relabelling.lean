@@ -102,7 +102,7 @@ theorem nonisomorphic_pruning {a : List PartialMatroid} :
 theorem permutationsComparison_mem_pruning_of_mem (A : List PartialMatroid) :
     A.Forall fun M ↦ ∃ M' ∈ pruning A, permutationsComparison n M.matroid M'.matroid := by
   induction A with
-  | nil => simp[pruning]
+  | nil => simp
   | cons h t IH =>
     rw [List.forall_iff_forall_mem]
     intro p hp

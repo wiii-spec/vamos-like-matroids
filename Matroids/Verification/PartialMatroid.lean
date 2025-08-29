@@ -190,10 +190,6 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
       apply h
 
 
-#eval LawfulSparsePavingMatroid 8 4 (Vamos).matroid
-#eval LawfulSparsePavingMatroid 8 4 (augment [0,1,2,3] Vamos).matroid
-
-
 
 lemma elimNearlySame_notAdding (l : List Nat) (A : List (List Nat)) :
     ∀ k, k ∈ (elimNearlySame l A) → k ∈ A := by

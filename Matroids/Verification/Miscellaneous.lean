@@ -48,9 +48,9 @@ lemma List.Forall.flatten {L : List (List α)} {P : α → Prop} (hl : L.Forall 
     L.flatten.Forall P := by
   unfold List.flatten
   match L with
-  | []      => simp [flatten]
+  | []      => simp
   | a :: as =>
-    simp [flatten]
+    simp
     have IH := List.Forall.flatten (L := as) (P := P)
     have h1 : Forall (fun l => Forall P l) as := by
       simp at hl

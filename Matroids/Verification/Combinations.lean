@@ -6,10 +6,10 @@ theorem combinations_entries_lengths (n k : Nat) :
     (combinations n k).all (fun l ↦ l.length = k) := by
   unfold combinations
   match n, k with
-  | _, 0 => simp [combinations]
-  | 0, _ + 1 => simp [combinations]
+  | _, 0 => simp
+  | 0, _ + 1 => simp
   | n + 1, k + 1 =>
-    simp [combinations]
+    simp
     constructor
     -- Prove by strong induction
     · intro l hl1
