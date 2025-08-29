@@ -49,8 +49,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 1
     simp (config := {decide := true}) at h
-    apply List.mem_mergeSort
-    simp
+    rw [← List.mem_mergeSort (r := (· < ·))]
+    simp [sort]
     right
     apply h
   · -- i = 0, j = 2
@@ -58,8 +58,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 2
     simp (config := {decide := true}) at h
-    apply List.mem_mergeSort
-    simp
+    rw [← List.mem_mergeSort (r := (· < ·))]
+    simp [sort]
     right
     apply h
   · -- i = 0, j = 3
@@ -67,8 +67,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 3
     simp (config := {decide := true}) at h
-    apply List.mem_mergeSort
-    simp
+    rw [← List.mem_mergeSort (r := (· < ·))]
+    simp [sort]
     right
     apply h
   · simp (config := {decide := true})
@@ -78,8 +78,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 1 2
     simp (config := {decide := true}) at h
-    apply List.mem_mergeSort
-    simp
+    rw [← List.mem_mergeSort (r := (· < ·))]
+    simp [sort]
     right
     apply h
   · -- i = 1, j = 3
@@ -87,8 +87,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 1 3
     simp (config := {decide := true}) at h
-    apply List.mem_mergeSort
-    simp
+    rw [← List.mem_mergeSort (r := (· < ·))]
+    simp [sort]
     right
     apply h
   · simp (config := {decide := true})
@@ -294,9 +294,7 @@ lemma augment_not_nearlySame (l : List Nat) (A : PartialMatroid)
   intro l₂ hl₂
   rw [List.forall_iff_forall_mem] at hA
   unfold augment at hl₁
-  simp at hl₁
-  apply List.reverse_mem_mergeSort at hl₁
-  simp at hl₁
+  simp [sort] at hl₁
   obtain hhl₁ | thl₁ := hl₁
   · rw [← hhl₁] at hl₂
     clear hhl₁

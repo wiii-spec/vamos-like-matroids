@@ -31,7 +31,7 @@ lemma groupBySecondInvariant_lawful (llA : List (List PartialMatroid))
   apply forall_groupByValue
   rw [List.forall_iff_forall_mem]
   intro C hC
-  apply List.reverse_mem_mergeSort at hC
+  rw [List.mem_mergeSort] at hC
   rw [List.forall_iff_forall_mem] at *
   apply hllA at hlB1
   rw [List.forall_iff_forall_mem] at hlB1
@@ -53,7 +53,7 @@ lemma groupByThirdInvariant_lawful (llA : List (List PartialMatroid))
   apply forall_groupByValue
   rw [List.forall_iff_forall_mem]
   intro C hC
-  apply List.reverse_mem_mergeSort at hC
+  rw [List.mem_mergeSort] at hC
   rw [List.forall_iff_forall_mem] at *
   apply hllA at hlB1
   rw [List.forall_iff_forall_mem] at hlB1
@@ -99,7 +99,7 @@ lemma groupBySecondInvariant_normalized (llA : List (List PartialMatroid))
   apply forall_groupByValue
   rw [List.forall_iff_forall_mem]
   intro C hC
-  apply List.reverse_mem_mergeSort at hC
+  rw [List.mem_mergeSort] at hC
   rw [List.forall_iff_forall_mem] at *
   apply hllA at hlB1
   rw [List.forall_iff_forall_mem] at hlB1
@@ -121,7 +121,7 @@ lemma groupByThirdInvariant_normalized (llA : List (List PartialMatroid))
   apply forall_groupByValue
   rw [List.forall_iff_forall_mem]
   intro C hC
-  apply List.reverse_mem_mergeSort at hC
+  rw [List.mem_mergeSort] at hC
   rw [List.forall_iff_forall_mem] at *
   apply hllA at hlB1
   rw [List.forall_iff_forall_mem] at hlB1
@@ -218,7 +218,8 @@ lemma mem_of_groupByFirstInvariant {A :PartialMatroid} {lA lB: List PartialMatro
     A ∈ lB := by
   unfold PartialMatroid.groupByFirstInvariant at h2
   have := mem_of_groupByValue h1 h2
-  exact List.reverse_mem_mergeSort _ this
+  rw [List.mem_mergeSort] at this
+  exact this
 
 
 lemma mem_of_groupBySecondInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
@@ -227,7 +228,8 @@ lemma mem_of_groupBySecondInvariant {A :PartialMatroid} {lA lB: List PartialMatr
     A ∈ lB := by
   unfold PartialMatroid.groupBySecondInvariant at h2
   have := mem_of_groupByValue h1 h2
-  exact List.reverse_mem_mergeSort _ this
+  rw [List.mem_mergeSort] at this
+  exact this
 
 lemma mem_of_groupByThirdInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
     (h1 : A ∈ lA)
@@ -235,7 +237,8 @@ lemma mem_of_groupByThirdInvariant {A :PartialMatroid} {lA lB: List PartialMatro
     A ∈ lB := by
   unfold PartialMatroid.groupByThirdInvariant at h2
   have := mem_of_groupByValue h1 h2
-  exact List.reverse_mem_mergeSort _ this
+  rw [List.mem_mergeSort] at this
+  exact this
 
 
 

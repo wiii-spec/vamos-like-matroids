@@ -10,17 +10,14 @@ theorem combinations_entries_lengths (n k : Nat) :
   | 0, _ + 1 => simp [combinations]
   | n + 1, k + 1 =>
     simp [combinations]
-    intro l hl
-    obtain hl1 | hl2 := hl
+    constructor
     -- Prove by strong induction
-    · have H := combinations_entries_lengths n (k + 1) -- inductive hypothesis
+    · intro l hl1
+      have H := combinations_entries_lengths n (k + 1) -- inductive hypothesis
       simp at H
-      -- exact H l hl1
       apply H
       apply hl1
-    · obtain ⟨l2, hl2, hl3⟩ := hl2
-      rw [← hl3]
-      simp
+    · intro l hl2
       have H := combinations_entries_lengths n k -- inductive hypothesis
       simp at H
       apply H
@@ -34,19 +31,14 @@ theorem combinations_entries_bounds (n k : Nat) :
     | 0, _ + 1 => simp [combinations]
     | n + 1, k + 1 =>
       simp [combinations]
-      intro l ha x h4
-      obtain h1 | h2 := ha
-      -- inductive hypothesis
-      · have H := combinations_entries_bounds n (k + 1)
+      constructor
+      · intro l h1 x h4
+        have H := combinations_entries_bounds n (k + 1)
         simp at H
         specialize H l h1 x h4
         omega
-      · have H := combinations_entries_bounds n k
+      · intro l h4 a ha
+        have H := combinations_entries_bounds n k
         simp at H
-        obtain ⟨ a,hx, hy⟩:= h2
-        rw[<- hy] at h4
-        simp at h4
-        obtain h5|h6 := h4
-        · specialize H a hx x h5
-          omega
-        · omega
+        specialize H l h4 a ha
+        omega
