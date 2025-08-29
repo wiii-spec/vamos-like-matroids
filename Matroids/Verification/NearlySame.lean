@@ -23,7 +23,6 @@ lemma nsame.comm {l₁ l₂ : List Nat} :
     · rw[if_neg, if_pos, if_neg, if_neg]
       rw[ @nsame.comm (i :: a) b]
       all_goals omega
-      termination_by _ l1 l2 => l1.length + l2.length
 
 
 

@@ -23,8 +23,8 @@ lemma forall_groupByValueAux (f : α → List ℕ) (A : List α) (hA : A.Forall 
     obtain ⟨h_ok, t_ok⟩ := hA
     obtain ⟨th_ok, tt_ok⟩ := t_ok
     have H := forall_groupByValueAux f (b :: t) (P := P)
-    have tt_ok1 : List.Forall P (b :: t)
-    · simp
+    have tt_ok1 : List.Forall P (b :: t) := by
+      simp
       constructor
       · exact th_ok
       · exact tt_ok
@@ -651,8 +651,8 @@ countAux L = f countAux sort L
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
   obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
-  have h_perm : List.Perm (List.mergeSort (fun x x_1 => x.1 < x_1.1) l) l
-  · apply List.perm_mergeSort
+  have h_perm : List.Perm (List.mergeSort (fun x x_1 => x.1 < x_1.1) l) l := by
+    apply List.perm_mergeSort
   rw [sort_expand l]
   dsimp
   rw [countAux'_expand]

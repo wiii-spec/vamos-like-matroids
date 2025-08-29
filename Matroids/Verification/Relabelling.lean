@@ -239,9 +239,6 @@ lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} :
   unfold relabelling
   simp
 
--- seems like this issue will go away when we bump to a newer Lean version
-theorem badBeq : instBEqNat = @instBEq ℕ Nat.decEq := sorry
-
 lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
   count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
   = count (List.sort (List.join L)) := by
@@ -253,8 +250,3 @@ lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ p
   specialize hf f ha
   have dummy := count_of_sort_map L hf
   convert dummy
-  rw [badBeq]
-  rw [badBeq]
-
-
-#print axioms count_of_relabelling

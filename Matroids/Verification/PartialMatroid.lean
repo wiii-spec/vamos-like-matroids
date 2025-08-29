@@ -105,7 +105,8 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     constructor
     · push_neg at hL
       intro p
-      rw[p] at hL
+      simp [P] at p
+      rw [p] at hL
       contradiction
     · apply h
   · simp (config := {decide := true})

@@ -183,10 +183,10 @@ lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
     intro x hx
     rw[List.forall_iff_forall_mem]
     intro y hy
-    suffices h : invariant1 x ≠ invariant1 y
-    contrapose! h
-    apply invariant1_of_isomorphic
-    exact h
+    suffices h : invariant1 x ≠ invariant1 y by
+      contrapose! h
+      apply invariant1_of_isomorphic
+      exact h
     exact ne_of_groupByValue h.ne hx hy
 
   -- Fin (List.length (groupByValue (List.mergeSort (fun l1 l2 => invariant1 l1 < invariant1 l2) A) invariant1))

@@ -158,9 +158,9 @@ lemma augmentations_remainingOptions_not_mem (A : PartialMatroid)
   rw [List.forall_iff_forall_mem]
   intro B _ hBB
   simp at hBB
-  have hc : [4, 5, 6, 7] ∈ A.remainingOptions
-  apply augment_notAdding B A
-  exact hBB
+  have hc : [4, 5, 6, 7] ∈ A.remainingOptions := by
+    apply augment_notAdding B A
+    exact hBB
   contradiction
 
 

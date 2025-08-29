@@ -5,10 +5,6 @@ import Mathlib.Data.Matrix.Notation
 open List
 variable {α β : Type*}
 
-@[simp] theorem Matrix.cons_val_three {α : Type*} {m : ℕ} (x : α) (u : Fin m.succ.succ.succ → α) :
-    vecCons x u 3 = vecHead (vecTail (vecTail u)) :=
-  rfl
-
 /-- Map a partially-defined (i.e. dependent) function `f` over a list, if the dependency is
 satisfied for every element of the list. -/
 def List.dependentMap {P : α → Prop} (f : ∀ a, P a → β) : ∀ (l : List α), l.Forall P → List β
@@ -56,8 +52,8 @@ lemma List.Forall.join {L : List (List α)} {P : α → Prop} (hl : L.Forall fun
   | a :: as =>
     simp [join]
     have IH := List.Forall.join (L := as) (P := P)
-    have h1 : Forall (fun l => Forall P l) as
-    · simp at hl
+    have h1 : Forall (fun l => Forall P l) as := by
+      simp at hl
       obtain ⟨th1, hh1⟩ := hl
       exact hh1
     apply IH at h1
