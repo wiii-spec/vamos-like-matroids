@@ -138,7 +138,7 @@ lemma sort_of_length [LinearOrder X] {A : List X}:
 
 lemma map_of_length {A : List α} {g : α → β }:
     (A.map g).length = A.length := by
-  exact List.length_map A g
+  exact List.length_map g
 
 theorem foo_sameUpToRelabelling {A B : List (List Nat)} {g : Nat → Nat}
     {h : sameUpToRelabelling A B g} : A.length = B.length := by

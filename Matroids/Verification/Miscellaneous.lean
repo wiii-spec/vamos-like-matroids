@@ -20,7 +20,7 @@ lemma List.forall_append_iff {L1 L2 : List α} {P : α → Prop} :
   | nil =>
     simp
   | cons h t IH =>
-    simp
+    simp [-forall_append]
     constructor
     · intro h1
       obtain ⟨th1, hh1⟩ := h1
@@ -59,7 +59,6 @@ lemma List.Forall.flatten {L : List (List α)} {P : α → Prop} (hl : L.Forall 
     apply IH at h1
     simp at hl
     obtain ⟨th1, hh1⟩ := hl
-    rw [forall_append_iff]
     constructor
     · exact th1
     · exact h1
@@ -68,7 +67,7 @@ theorem List.pairwise_range {R : ℕ → ℕ → Prop} (H : ∀ i j, i < j → R
     List.Pairwise R (List.range n) := by
   apply @List.Pairwise.imp Nat (fun a b => a < b) R
   · apply H
-  · exact pairwise_lt_range n
+  · exact pairwise_lt_range
 
 
 lemma List.Forall.perm {L₁ L₂ :List X} {P : X → Prop } (hL : L₁.Perm L₂)
