@@ -134,8 +134,8 @@ lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
 lemma sort_join_sort {X :Type} [LinearOrder X] (L : List (List X)) :
     List.sort (List.join (List.sort L)) = List.sort (List.join (L)) := by
   match L with
-  |[] => simp
-  |a :: ll =>
+  | [] => simp [List.sort]
+  | a :: ll =>
     simp
     have h := sort_join_sort ll
     match a with

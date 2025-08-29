@@ -88,7 +88,7 @@ theorem nonisomorphic_pruning {a : List PartialMatroid} :
     · apply induct_h
     · split
       · apply induct_h
-      · case inr.inr ha =>
+      · rename_i ha
         rw [List.pairwise_cons]
         constructor
         · simp at ha
