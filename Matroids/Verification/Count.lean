@@ -76,10 +76,10 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
 --UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
 
 theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
-    {i j : Fin (groupByValue (A.mergeSort (f · < f ·)) f).length}
+    {i j : Fin (groupByValue (A.mergeSort (f · ≤ f ·)) f).length}
     (h : i ≠ j) {x y : PartialMatroid}
-    (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
-    (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
+    (hx : x ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get i)
+    (hy : y ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get j) :
     f x ≠ f y := by
   contrapose! h
   -- unfold groupByValue at hx hy
@@ -88,10 +88,10 @@ theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} 
 
 -- this should be a simple consequence of the above but there are BEq issues, skip for now
 theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List Nat}
-    {i j : Fin (groupByValue (A.mergeSort (f · < f ·)) f).length}
+    {i j : Fin (groupByValue (A.mergeSort (f · ≤ f ·)) f).length}
     (h : i ≠ j) {x y : PartialMatroid}
-    (hx : x ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get i)
-    (hy : y ∈ (groupByValue (A.mergeSort (f · < f ·)) f).get j) :
+    (hx : x ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get i)
+    (hy : y ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get j) :
     f x ≠ f y := by
   -- apply ne_of_groupByValue' h hx hy
   sorry
@@ -195,8 +195,7 @@ lemma sort_stick (L : List X) [LinearOrder X]:
   unfold Sticking
   unfold List.sort
   rw[check_stick_eq_destutter]
-  rw[List.mergeSort_lt_eq_mergeSort_le']
-  have := List.sorted_mergeSort'' (· ≤ ·) (l := L)
+  have := List.sorted_mergeSort' (l := L)
   have := check_stick_sorted this
   have hh := @ne_of_lt X inferInstance
   apply List.Pairwise.imp hh this
@@ -626,22 +625,19 @@ lemma perm_expand {l₁ l₂ : List ( X × Nat)} (hl : l₁.Perm l₂) :
 
 
 theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
-    List.sort (X := X) (expand l) = expand (l.mergeSort (fun (x1, _) (x2, _) ↦ x1 < x2)) := by
+    List.sort (X := X) (expand l) = expand (l.mergeSort (fun (x1, _) (x2, _) ↦ x1 ≤ x2)) := by
   simp
   have := mergeSort_sorted_list_X_Nat l
   simp at this
   have lhs_sorted := sorted_expand_sorted this
-  rw[mergeSort_lt_le_eq_List_X_Nat] at lhs_sorted
   unfold List.sort
-  have rhs_sorted := (expand l).sorted_mergeSort'' (α := X) (· ≤ ·)
+  have rhs_sorted := (expand l).sorted_mergeSort' (α := X)
   have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
   have perm_rhs_lhs := perm_expand this
   have := List.mergeSort_perm (expand l) (· ≤ · )
   apply List.Perm.symm at this
   have perm_rhs_lhs := List.Perm.trans perm_rhs_lhs this
   have h := List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
-  rw[mergeSort_lt_le_eq_List_X_Nat, List.mergeSort_lt_eq_mergeSort_le']
-  simp
   rw[h]
 
 -- theorem
@@ -653,13 +649,12 @@ and
 countAux L = f countAux sort L
 -/
 
-#check List.Perm.trans
 
 
 lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
   obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
-  have h_perm : List.Perm (List.mergeSort l (fun x x_1 => x.1 < x_1.1)) l := by
+  have h_perm : List.Perm (List.mergeSort l (fun x x_1 => x.1 ≤ x_1.1)) l := by
     apply List.mergeSort_perm
   rw [sort_expand l]
   dsimp

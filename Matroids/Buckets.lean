@@ -69,14 +69,14 @@ def invariant3 (A: PartialMatroid) : List Nat := pairing (complement A.matroid)
 
 /-- NEED TO WRITE -/
 def groupByFirstInvariant (A: List PartialMatroid) : List (List PartialMatroid) :=
-   groupByValue (A.mergeSort (fun l1 l2 => invariant1 l1 < invariant1 l2)) invariant1
+   groupByValue (A.mergeSort (fun l1 l2 => invariant1 l1 ≤ invariant1 l2)) invariant1
 
 /-- NEED TO WRITE -/
 def groupBySecondInvariant (A: List PartialMatroid) : List (List PartialMatroid) :=
-   groupByValue (A.mergeSort (fun l1 l2 => invariant2 l1 < invariant2 l2)) invariant2
+   groupByValue (A.mergeSort (fun l1 l2 => invariant2 l1 ≤ invariant2 l2)) invariant2
 
 def groupByThirdInvariant (A: List PartialMatroid) : List (List PartialMatroid) :=
-   groupByValue (A.mergeSort (fun l1 l2 => invariant3 l1 < invariant3 l2)) invariant3
+   groupByValue (A.mergeSort (fun l1 l2 => invariant3 l1 ≤ invariant3 l2)) invariant3
 
 /-Function that shows us the bucket each partial matroid belongs to by applying `invariant1`
 followed by `invariant2`-/
