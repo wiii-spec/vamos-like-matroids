@@ -4,7 +4,7 @@ import Mathlib.Data.Matrix.Notation
 /-- A "valid" (n, r) sparse paving matroid; here `n` is the number of elements of the matroid and
 `r` is its rank. -/
 @[mk_iff]
-structure LawfulSparsePavingMatroid (n r : ℕ) (l : List (List ℕ)) : Prop :=
+structure LawfulSparsePavingMatroid (n r : ℕ) (l : List (List ℕ)) : Prop where
   (mem_range : l.Forall (List.Forall fun i ↦ i < n))
   (length_eq_rank : l.Forall fun m ↦ m.length = r)
   (sorted_of_mem : l.Forall fun m ↦ m.Sorted (· < ·))

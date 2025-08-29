@@ -18,10 +18,10 @@ lemma groupByFirstInvariant_lawful (A : List PartialMatroid)
 
 lemma groupBySecondInvariant_lawful (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid)) :
-    (llA.map groupBySecondInvariant).join.Forall
+    (llA.map groupBySecondInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid) := by
   unfold groupBySecondInvariant
-  apply List.Forall.join
+  apply List.Forall.flatten
   rw [List.forall_iff_forall_mem]
   intro llB hllB
   rw[List.mem_map] at hllB
@@ -40,10 +40,10 @@ lemma groupBySecondInvariant_lawful (llA : List (List PartialMatroid))
 
 lemma groupByThirdInvariant_lawful (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid)) :
-    (llA.map groupByThirdInvariant).join.Forall
+    (llA.map groupByThirdInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ LawfulSparsePavingMatroid n r M.matroid) := by
   unfold groupByThirdInvariant
-  apply List.Forall.join
+  apply List.Forall.flatten
   rw [List.forall_iff_forall_mem]
   intro llB hllB
   rw[List.mem_map] at hllB
@@ -86,10 +86,10 @@ lemma groupByFirstInvariant_normalized (lA : List PartialMatroid)
 
 lemma groupBySecondInvariant_normalized (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
-    (llA.map groupBySecondInvariant).join.Forall
+    (llA.map groupBySecondInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
   unfold groupBySecondInvariant
-  apply List.Forall.join
+  apply List.Forall.flatten
   rw [List.forall_iff_forall_mem]
   intro llB hllB
   rw[List.mem_map] at hllB
@@ -108,10 +108,10 @@ lemma groupBySecondInvariant_normalized (llA : List (List PartialMatroid))
 
 lemma groupByThirdInvariant_normalized (llA : List (List PartialMatroid))
     (hllA : llA.Forall fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid)) :
-    (llA.map groupByThirdInvariant).join.Forall
+    (llA.map groupByThirdInvariant).flatten.Forall
     fun l ↦ l.Forall (fun M ↦ List.NormalizedVamosLike M.matroid) := by
   unfold groupByThirdInvariant
-  apply List.Forall.join
+  apply List.Forall.flatten
   rw [List.forall_iff_forall_mem]
   intro llB hllB
   rw[List.mem_map] at hllB
@@ -158,8 +158,8 @@ lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → 
   unfold invariant1
   have h := @count_of_relabelling M₂.matroid f ha
   rw[hb] at h
-  rw[sort_join_sort] at h
-  rw[sort_join_map_sort] at h
+  rw[sort_flatten_sort] at h
+  rw[sort_flatten_map_sort] at h
   apply h
   -- hopefully follows from count_of_relabelling?
 
@@ -247,11 +247,11 @@ lemma mem_of_groupByBucket {A :PartialMatroid} {lA lB: List PartialMatroid}
     (h2 : lA ∈ PartialMatroid.groupByBucket lB) :
     A ∈ lB := by
     unfold PartialMatroid.groupByBucket at h2
-    rw [List.mem_join] at h2
+    rw [List.mem_flatten] at h2
     obtain ⟨ l₁, hl1, hla1⟩ := h2
     rw[List.mem_map] at hl1
     obtain ⟨ l₂, hl2, hla2⟩ := hl1
-    rw [List.mem_join] at hl2
+    rw [List.mem_flatten] at hl2
     obtain ⟨ l₃ , hl3, hla3⟩ := hl2
     simp at hl3
     obtain ⟨ l₄ , hl4, hla4⟩ := hl3

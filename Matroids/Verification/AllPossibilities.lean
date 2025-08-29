@@ -82,7 +82,7 @@ lemma augmentationsFinal_lawful (i : ℕ) (M : PartialMatroid)
   match i with
   | 0 => simp [hM]
   | k + 1 =>
-    apply List.Forall.join
+    apply List.Forall.flatten
     rw [List.forall_map_iff]
     rw [List.forall_iff_forall_mem]
     -- let `B` be a matroid in the augmentations list of `A`
@@ -171,7 +171,7 @@ lemma augmentationsFinal_normalized (i : ℕ) (A : PartialMatroid)
   match i with
   | 0 => simp [hAM]
   | j + 1 =>
-    apply List.Forall.join
+    apply List.Forall.flatten
     rw [List.forall_map_iff]
     rw [List.forall_iff_forall_mem]
     -- let `B` be a matroid in the augmentations list of `A`

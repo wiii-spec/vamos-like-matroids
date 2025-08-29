@@ -26,4 +26,4 @@ def augmentationsFinal : Nat → PartialMatroid → List PartialMatroid
    | 0, A => [A]
    | n + 1, A =>
       let addNEdges : PartialMatroid → List PartialMatroid := augmentationsFinal n
-      ((augmentations A).map addNEdges).join
+      ((augmentations A).map addNEdges).flatten

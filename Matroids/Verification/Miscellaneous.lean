@@ -44,14 +44,14 @@ lemma List.forall_append_iff {L1 L2 : List α} {P : α → Prop} :
         · exact hh1
 
 
-lemma List.Forall.join {L : List (List α)} {P : α → Prop} (hl : L.Forall fun l ↦ l.Forall P) :
-    L.join.Forall P := by
-  unfold List.join
+lemma List.Forall.flatten {L : List (List α)} {P : α → Prop} (hl : L.Forall fun l ↦ l.Forall P) :
+    L.flatten.Forall P := by
+  unfold List.flatten
   match L with
-  | []      => simp [join]
+  | []      => simp [flatten]
   | a :: as =>
-    simp [join]
-    have IH := List.Forall.join (L := as) (P := P)
+    simp [flatten]
+    have IH := List.Forall.flatten (L := as) (P := P)
     have h1 : Forall (fun l => Forall P l) as := by
       simp at hl
       obtain ⟨th1, hh1⟩ := hl

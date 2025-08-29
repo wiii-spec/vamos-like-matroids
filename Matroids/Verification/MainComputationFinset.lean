@@ -9,7 +9,7 @@ the `List` datatype) in the language of the `Finset` datatype.
 
 /-- A "valid" (n, r) sparse paving matroid; here `n` is the number of elements of the matroid and
 `r` is its rank. -/
-structure Finset.LawfulSparsePavingMatroid (n r : ℕ) (s : Finset (Finset (Fin n))) : Prop :=
+structure Finset.LawfulSparsePavingMatroid (n r : ℕ) (s : Finset (Finset (Fin n))) : Prop where
   (card_eq_rank : ∀ m ∈ s, m.card = r)
   (pairwise_not_nearlySame : (s : Set (Finset (Fin n))).Pairwise (fun a b ↦ (a ∩ b).card + 2 ≤ r))
 

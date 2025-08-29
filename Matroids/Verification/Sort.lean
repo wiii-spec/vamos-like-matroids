@@ -120,13 +120,13 @@ lemma sort_map_sort {L : List X} [LinearOrder X] {f: X → X}:
     List.sort ( List.map f L.sort) = List.sort (List.map f L) := by
   sorry
 
-lemma sort_join_sort {X :Type} [LinearOrder X] (L : List (List X)) :
-    List.sort (List.join (List.sort L)) = List.sort (List.join (L)) := by
+lemma sort_flatten_sort {X :Type} [LinearOrder X] (L : List (List X)) :
+    List.sort (List.flatten (List.sort L)) = List.sort (List.flatten (L)) := by
   match L with
   | [] => simp [List.sort]
   | a :: ll =>
     simp
-    have h := sort_join_sort ll
+    have h := sort_flatten_sort ll
     match a with
     |[] =>
       simp
@@ -135,8 +135,8 @@ lemma sort_join_sort {X :Type} [LinearOrder X] (L : List (List X)) :
       sorry
 -- proof idea: consider number of occurence in each list, should be the same
 
-lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
-    List.sort (List.join (List.map List.sort L)) = List.sort (List.join (L)) := by
+lemma sort_flatten_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
+    List.sort (List.flatten (List.map List.sort L)) = List.sort (List.flatten (L)) := by
   sorry
 
 

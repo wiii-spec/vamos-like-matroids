@@ -53,7 +53,7 @@ def countAux' (l : List X) [DecidableEq X]: List ℕ :=
 permutations of elements that get counted but rather by the quantity of different elements. -/
 def count (l: List X) [DecidableEq X]: List Nat  := (countAux' l).sort
 
-def expand (l : List (X × Nat)) : List X := (l.map fun (x, n) ↦ List.replicate n x).join
+def expand (l : List (X × Nat)) : List X := (l.map fun (x, n) ↦ List.replicate n x).flatten
 
 /--sorts a series of partial matroids (with the same original partial matroid and remaining options)
 by their characteristic obtained from running them through a mapping function. It sorts it by

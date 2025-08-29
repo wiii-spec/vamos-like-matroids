@@ -42,24 +42,24 @@ lemma prunedVamos_normalized (i : ℕ) :
   apply List.Forall.imp pruning_normalized
   apply augmentedVamos_normalized
 
-lemma joinedPrunedVamos_lawful :
-    joinedPrunedVamos.Forall fun M ↦ LawfulSparsePavingMatroid 8 4 M.matroid := by
-  unfold joinedPrunedVamos
-  apply List.Forall.join
+lemma flattenedPrunedVamos_lawful :
+    flattenedPrunedVamos.Forall fun M ↦ LawfulSparsePavingMatroid 8 4 M.matroid := by
+  unfold flattenedPrunedVamos
+  apply List.Forall.flatten
   rw [List.forall_map_iff]
   rw [List.forall_iff_forall_mem]
   intro i _
-  apply List.Forall.join
+  apply List.Forall.flatten
   apply prunedVamos_lawful
 
-lemma joinedPrunedVamos_normalized :
-    joinedPrunedVamos.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
-  unfold joinedPrunedVamos
-  apply List.Forall.join
+lemma flattenedPrunedVamos_normalized :
+    flattenedPrunedVamos.Forall fun M ↦ List.NormalizedVamosLike M.matroid := by
+  unfold flattenedPrunedVamos
+  apply List.Forall.flatten
   rw [List.forall_map_iff]
   rw [List.forall_iff_forall_mem]
   intro i _
-  apply List.Forall.join
+  apply List.Forall.flatten
   apply prunedVamos_normalized
 
 
@@ -152,17 +152,17 @@ theorem length_prunedVamos {i : ℕ} {A : PartialMatroid} {lA' : List PartialMat
   * after applying `pruning`, everything in a list is non-isomorphic
   * after applying `groupByBucket`, everything in different buckets is non-isomorphic
   * augmenting by different numbers of quadrangles cannot be isomorphic -/
-lemma nonisomorphic_joinedPrunedVamos :
-    joinedPrunedVamos.Pairwise (fun A₁ A₂ ↦ ¬ permutationsComparison 8 A₁.matroid A₂.matroid) := by
-  unfold joinedPrunedVamos
-  rw [List.pairwise_join]
+lemma nonisomorphic_flattenedPrunedVamos :
+    flattenedPrunedVamos.Pairwise (fun A₁ A₂ ↦ ¬ permutationsComparison 8 A₁.matroid A₂.matroid) := by
+  unfold flattenedPrunedVamos
+  rw [List.pairwise_flatten]
   constructor
   · intro lA hlA
     rw[List.mem_map] at hlA
     obtain ⟨ i, hi1, hi2⟩ := hlA
     rw [←hi2]
     clear hi2 lA
-    rw [List.pairwise_join]
+    rw [List.pairwise_flatten]
     constructor
     · rw [← List.forall_iff_forall_mem]
       apply forall_nonisomorphic_prunedVamos
@@ -171,7 +171,7 @@ lemma nonisomorphic_joinedPrunedVamos :
   · rw [List.pairwise_map]
     apply List.pairwise_range
     intro i j hij A hA B hB
-    rw [List.mem_join] at hA hB
+    rw [List.mem_flatten] at hA hB
     obtain ⟨ lA', hlA', hA⟩ := hA
     obtain ⟨ lB', hlB', hB⟩ := hB
     apply nonisomorphic_of_length
@@ -193,14 +193,14 @@ Informally: Theorem 1 -/
 theorem mainComputation_lawful : mainComputation.Forall (LawfulSparsePavingMatroid 8 4) := by
   unfold mainComputation
   rw [List.forall_map_iff]
-  apply joinedPrunedVamos_lawful
+  apply flattenedPrunedVamos_lawful
 
 /-- The main computation produces only `List (List ℕ)` objects which are "normalized Vámos-like".
 Informally: Theorem 2 -/
 theorem mainComputation_normalizedVamosLike: mainComputation.Forall List.NormalizedVamosLike := by
   unfold mainComputation
   rw [List.forall_map_iff]
-  apply joinedPrunedVamos_normalized
+  apply flattenedPrunedVamos_normalized
 
 /-- The list of `List (List ℕ)` objects provided by the main computation are mutually
 non-isomorphic (up to permutation of 0, 1, 2, ... 7).
@@ -209,7 +209,7 @@ theorem nonisomorphic_mainComputation :
     mainComputation.Pairwise (fun l₁ l₂ ↦ ¬ permutationsComparison 8 l₁ l₂) := by
   unfold mainComputation
   rw [List.pairwise_map]
-  apply nonisomorphic_joinedPrunedVamos
+  apply nonisomorphic_flattenedPrunedVamos
 
 /-- Any "normalized Vámos-like" `List (List ℕ)` object which is valid as an (8, 4) sparse paving
 matroid is isomorphic to one of the objects on the list provided by the main computation.

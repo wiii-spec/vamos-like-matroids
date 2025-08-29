@@ -617,7 +617,7 @@ lemma sorted_expand_sorted [LinearOrder X] {l : List (X × Nat)} (l_sorted : l.S
 lemma perm_expand {l₁ l₂ : List ( X × Nat)} (hl : l₁.Perm l₂) :
     (expand l₁).Perm (expand l₂) := by
   unfold expand
-  apply List.Perm.join
+  apply List.Perm.flatten
   apply List.Perm.map
   apply hl
 
@@ -703,14 +703,14 @@ lemma count_of_stick {L : List X} [LinearOrder X] (hl : Sticking L) :
 -- #check Tuple.comp_sort_eq_iff_monotone
 
 lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [LinearOrder X]:
-    count (List.sort (List.join (List.map (List.map f) L))) = count (List.sort (List.join L)) := by
-  rw [← List.map_join]
+    count (List.sort (List.flatten (List.map (List.map f) L))) = count (List.sort (List.flatten L)) := by
+  rw [← List.map_flatten]
   rw[← sort_map_sort]
-  have h2 := map_stick_stick (sort_stick L.join) hf
+  have h2 := map_stick_stick (sort_stick L.flatten) hf
   rw[← count_of_stick h2]
   rw[← count_of_map hf]
   -- unfold count
-  -- simp [-List.map_join]
+  -- simp [-List.map_flatten]
   -- congr! 3
 
 

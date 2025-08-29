@@ -13,16 +13,16 @@ open PartialMatroid
 
 
 def augmentationsTwo (A : PartialMatroid) : List PartialMatroid :=
-  ((augmentations A).map augmentations).join
+  ((augmentations A).map augmentations).flatten
 
 def augmentationsThree (A : PartialMatroid) : List PartialMatroid :=
-   ((augmentations A).map augmentationsTwo).join
+   ((augmentations A).map augmentationsTwo).flatten
 
 def augmentationsFour (A : PartialMatroid) : List PartialMatroid :=
-   ((augmentations A).map augmentationsThree).join
+   ((augmentations A).map augmentationsThree).flatten
 
 def augmentationsFive (A : PartialMatroid) : List PartialMatroid :=
-   ((augmentations A).map augmentationsFour).join
+   ((augmentations A).map augmentationsFour).flatten
 
 /-- info: { matroid := [[0, 1, 2], [0, 3, 4], [1, 3, 5]], remainingOptions := [] } -/
 #guard_msgs in

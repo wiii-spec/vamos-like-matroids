@@ -26,11 +26,11 @@ def List.pairs : List α → List (List α)
 
 /-- The use of sort allows the bucket to be sorted, so that [1,2,3] is the same as [1,3,2]
 count allows us to look at the number of figures each point touches -/
-def invariant1 (A: PartialMatroid) : List Nat := count A.matroid.join.sort
+def invariant1 (A: PartialMatroid) : List Nat := count A.matroid.flatten.sort
 
 /-- Takes in a list of lists and gives out a list of all the possible pairs
  of natural numbers in it-/
-def pairing (A: List (List Nat)) : List Nat := count (((((A.map)) (List.pairs)).join).sort)
+def pairing (A: List (List Nat)) : List Nat := count (((((A.map)) (List.pairs)).flatten).sort)
 
 
 
@@ -81,7 +81,7 @@ def groupByThirdInvariant (A: List PartialMatroid) : List (List PartialMatroid) 
 /-Function that shows us the bucket each partial matroid belongs to by applying `invariant1`
 followed by `invariant2`-/
 def groupByBucket (A: List PartialMatroid) : List (List PartialMatroid) :=
-   (((((groupByFirstInvariant A).map) (groupBySecondInvariant)).join).map (groupByThirdInvariant)).join
+   (((((groupByFirstInvariant A).map) (groupBySecondInvariant)).flatten).map (groupByThirdInvariant)).flatten
 
 /-- NOT USED IN FINAL COMPUTATION. Shows us the number of each distinct bucket. -/
 def countBuckets (A: List PartialMatroid) : List Nat :=

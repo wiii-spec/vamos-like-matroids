@@ -232,17 +232,17 @@ lemma permutation_bijective (n : ℕ):
 
 
 
-lemma join_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} :
-  List.join (relabelling L f) = List.map f (List.join L) := by
+lemma flatten_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} :
+  List.flatten (relabelling L f) = List.map f (List.flatten L) := by
   unfold relabelling
   simp
 
 lemma count_of_relabelling {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
-  count (List.sort (List.join (List.sort (List.map List.sort (relabelling L f)))))
-  = count (List.sort (List.join L)) := by
-  rw[sort_join_sort]
-  rw[sort_join_map_sort]
-  rw[join_of_relabelling]
+  count (List.sort (List.flatten (List.sort (List.map List.sort (relabelling L f)))))
+  = count (List.sort (List.flatten L)) := by
+  rw[sort_flatten_sort]
+  rw[sort_flatten_map_sort]
+  rw[flatten_of_relabelling]
   simp
   have hf := permutation_bijective 8
   specialize hf f ha

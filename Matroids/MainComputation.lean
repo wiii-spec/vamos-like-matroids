@@ -21,10 +21,10 @@ def augmentedVamos (i : ℕ) : List (List PartialMatroid) :=
 irreducible_def prunedVamos (i : ℕ) : List (List PartialMatroid) := (augmentedVamos i).map pruning
 
 /-- concatenate buckets and then concatenate over all `i` -/
-def joinedPrunedVamos : List PartialMatroid :=
-  ((List.range 9).map fun i ↦ (prunedVamos i).join).join
+def flattenedPrunedVamos : List PartialMatroid :=
+  ((List.range 9).map fun i ↦ (prunedVamos i).flatten).flatten
 
 /-- forget the information about what more could be augmented to each and just present the
 quadrangle information -/
 def mainComputation : List (List (List ℕ)) :=
-  joinedPrunedVamos.map PartialMatroid.matroid
+  flattenedPrunedVamos.map PartialMatroid.matroid
