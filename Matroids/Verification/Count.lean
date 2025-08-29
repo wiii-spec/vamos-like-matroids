@@ -68,14 +68,8 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
   simp [List.forall_iff_forall_mem] at H
   exact H hA
 
---
 
--- TODO generalize codomain of `f` to arbitrary linear order output
--- apparently some `BEq` bug
-
---UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
-
-theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
     {i j : Fin (groupByValue (A.mergeSort (f · ≤ f ·)) f).length}
     (h : i ≠ j) {x y : PartialMatroid}
     (hx : x ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get i)
@@ -84,16 +78,6 @@ theorem ne_of_groupByValue' {A : List PartialMatroid} {f: PartialMatroid → X} 
   contrapose! h
   -- unfold groupByValue at hx hy
   -- simp at hx hy
-  sorry
-
--- this should be a simple consequence of the above but there are BEq issues, skip for now
-theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → List Nat}
-    {i j : Fin (groupByValue (A.mergeSort (f · ≤ f ·)) f).length}
-    (h : i ≠ j) {x y : PartialMatroid}
-    (hx : x ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get i)
-    (hy : y ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get j) :
-    f x ≠ f y := by
-  -- apply ne_of_groupByValue' h hx hy
   sorry
 
 lemma countAux_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):

@@ -1,7 +1,6 @@
 import Mathlib.Data.List.Lex
 import Matroids.Sort
 
-variable {X : Type*} [LT X] [DecidableRel ((·:X) < · )] [BEq X ]
 
 /-! # Code to ---
 
@@ -35,7 +34,7 @@ Shouls be a part of Buckets.lean
 /-- Function to count the number of ocurrences of a specific elements in a sorted list. We first
 sort the list. Then we count the number of consecutive things that occur. Once something different
 from the last item pops up, we start a new count. -/
-def countAux : List X → Nat × List Nat
+def countAux [BEq X] : List X → Nat × List Nat
    | [] => (0, []) -- check
    | [_] => (1, []) -- check
    | a :: b :: t =>
