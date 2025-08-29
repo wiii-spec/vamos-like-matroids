@@ -24,8 +24,7 @@ lemma List.split_of_sublist {α : Type*} {l : List α} :
     simp
     have ih := List.split_of_sublist (l := l)
     constructor
-    · apply List.Sublist.cons_cons
-      exact ih.2
+    · exact ih.2
     · apply List.sublist_cons_of_sublist
       exact ih.1
 

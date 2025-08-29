@@ -194,7 +194,6 @@ lemma List.relabelling_mem_mul (l₁ l₂ : List (Nat → Nat)) (hg : g ∈ l₁
   rw[@List.mem_map] at hg
   simp at hg
   obtain ⟨a, b, hab, habg⟩ := hg
-  rw [@pair_mem_product] at hab
   use a
   constructor
   · exact hab.1
@@ -214,7 +213,6 @@ lemma permutation_bijective (n : ℕ):
   | k + 1 =>
     have induction_h := permutation_bijective k
     unfold permutation
-    simp
     intro g hg
     -- apply list_prop Function.Bijective (List.range (k+1)) (Equiv.swapCore k)
     -- simp at hg
