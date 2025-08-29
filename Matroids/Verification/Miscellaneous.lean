@@ -72,12 +72,6 @@ theorem List.pairwise_range {R : ℕ → ℕ → Prop} (H : ∀ i j, i < j → R
   apply @List.Pairwise.imp Nat (fun a b => a < b) R
   · apply H
   · exact pairwise_lt_range n
--- in the file Init.Data.List.Sublist
--- added in https://github.com/leanprover/lean4/pull/5053, August 2024
-theorem List.Sublist.mem {α : Type*} {l₁ : List α} {a : α} {l₂ : List α} (hx : a ∈ l₁)
-    (hl : l₁.Sublist l₂) :
-    a ∈ l₂ :=
-  sorry
 
 
 lemma List.Forall.perm {L₁ L₂ :List X} {P : X → Prop } (hL : L₁.Perm L₂)

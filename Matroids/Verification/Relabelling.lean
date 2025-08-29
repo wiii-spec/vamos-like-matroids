@@ -134,7 +134,7 @@ lemma sort_of_length [LinearOrder X] {A : List X}:
     (A.sort).length = A.length := by
   refine (List.Perm.length_eq ?p).symm
   unfold List.sort
-  exact List.Perm.symm (List.perm_mergeSort (fun x x_1 => x < x_1) A)
+  exact List.Perm.symm (List.mergeSort_perm (fun x x_1 => x < x_1) A)
 
 lemma map_of_length {A : List α} {g : α → β }:
     (A.map g).length = A.length := by

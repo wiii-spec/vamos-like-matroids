@@ -49,7 +49,7 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 1
     simp (config := {decide := true}) at h
-    rw [← List.mem_mergeSort (r := (· < ·))]
+    rw [← List.mem_mergeSort (le := (· < ·))]
     simp [sort]
     right
     apply h
@@ -58,7 +58,7 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 2
     simp (config := {decide := true}) at h
-    rw [← List.mem_mergeSort (r := (· < ·))]
+    rw [← List.mem_mergeSort (le := (· < ·))]
     simp [sort]
     right
     apply h
@@ -67,7 +67,7 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 0 3
     simp (config := {decide := true}) at h
-    rw [← List.mem_mergeSort (r := (· < ·))]
+    rw [← List.mem_mergeSort (le := (· < ·))]
     simp [sort]
     right
     apply h
@@ -78,7 +78,7 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 1 2
     simp (config := {decide := true}) at h
-    rw [← List.mem_mergeSort (r := (· < ·))]
+    rw [← List.mem_mergeSort (le := (· < ·))]
     simp [sort]
     right
     apply h
@@ -87,7 +87,7 @@ lemma augment_normalized (l : List Nat) (A : PartialMatroid)
     simp (config := {decide := true})
     have h := hA 1 3
     simp (config := {decide := true}) at h
-    rw [← List.mem_mergeSort (r := (· < ·))]
+    rw [← List.mem_mergeSort (le := (· < ·))]
     simp [sort]
     right
     apply h
@@ -168,10 +168,9 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
           · refine { irrefl := ?_ }
             simp
             apply NearlySame.refl
-    -- apply List.sorted_mergeSort
     apply List.Sorted.lt_of_le
     · rw [List.mergeSort_lt_eq_mergeSort_le h_nodup]
-      apply List.sorted_mergeSort
+      apply List.sorted_mergeSort''
     · apply List.mergeSort_no_duplicates
 
   pairwise_not_nearlySame := by
@@ -180,7 +179,7 @@ lemma augment_lawful (l : List Nat) (A : PartialMatroid)
     have matroid_pairwise_not_nearlySame:= hA.pairwise_not_nearlySame
     apply List.Perm.pairwise (l := l::(A.matroid))
     · apply List.Perm.symm
-      apply List.perm_mergeSort
+      apply List.mergeSort_perm
     · dsimp
       constructor
       · intro l₁ hl₁

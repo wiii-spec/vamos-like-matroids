@@ -79,13 +79,13 @@ lemma List.mergeSort_lt_eq_mergeSort_le' [LinearOrder α] {l : List α}:
     mergeSort (· < ·) l = mergeSort (· ≤ ·) l  := by
   sorry
 
-lemma List.not_mem_mergeSort (r : α → α → Prop) [h: DecidableRel r] {l : List α} (h : a ∉ l) :
+lemma List.not_mem_mergeSort (r : α → α → Bool) {l : List α} (h : a ∉ l) :
     a ∉ l.mergeSort r := by
   rw [List.Perm.mem_iff]
   · apply h
-  · apply List.perm_mergeSort
+  · apply List.mergeSort_perm
 
-lemma List.forall_mergeSort (r : α → α → Prop) [h: DecidableRel r] {l : List α} {P : α → Prop }
+lemma List.forall_mergeSort (r : α → α → Bool) {l : List α} {P : α → Prop }
     (h1 : l.Forall P) : (l.mergeSort (r)).Forall P := by
   rw [List.forall_iff_forall_mem]
   intro i hi
@@ -94,9 +94,14 @@ lemma List.forall_mergeSort (r : α → α → Prop) [h: DecidableRel r] {l : Li
   rw [List.Perm.mem_iff]
   apply hi
   apply List.Perm.symm
-  apply List.perm_mergeSort
+  apply List.mergeSort_perm
 
-
+-- switch to library `List.sorted_mergeSort'` after
+-- https://github.com/leanprover-community/mathlib4/pull/16902
+theorem List.sorted_mergeSort'' {α : Type u} (r : α → α → Prop) [DecidableRel r] [IsTotal α r]
+    [IsTrans α r] (l : List α) :
+    Sorted r (l.mergeSort fun (x1 x2 : α) => decide (r x1 x2)) :=
+  sorry
 
 /- PENDING theorem: If you have two different sorted lists and you run merge on them,
 then the result has to be sorted. Take a look at theorem Sorted.merge-/
@@ -137,14 +142,8 @@ lemma sort_join_map_sort {X : Type} [LinearOrder X] (L : List (List X)):
   sorry
 
 
-lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Prop) [DecidableRel P] (hL : L₁.Perm L₂) :
+lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Bool) (hL : L₁.Perm L₂) :
     List.mergeSort P L₁ = List.mergeSort P L₂ := by
-  sorry
-
-
-/- existing lemma in mathlib-/
-theorem List.mergeSort_perm {α : Type u_1} (l : List α) (le : α → α → Prop) [DecidableRel le]:
-    (l.mergeSort le).Perm l := by
   sorry
 
 

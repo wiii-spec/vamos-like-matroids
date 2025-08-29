@@ -196,7 +196,7 @@ lemma sort_stick (L : List X) [LinearOrder X]:
   unfold List.sort
   rw[check_stick_eq_destutter]
   rw[List.mergeSort_lt_eq_mergeSort_le']
-  have := List.sorted_mergeSort (· ≤ ·) (l := L)
+  have := List.sorted_mergeSort'' (· ≤ ·) (l := L)
   have := check_stick_sorted this
   have hh := @ne_of_lt X inferInstance
   apply List.Pairwise.imp hh this
@@ -293,14 +293,18 @@ lemma map_stick_stick {L : List X} [LinearOrder X] (hl : Sticking L) {f : X → 
       constructor
       · unfold Sticking at hl
         unfold check_stick at hl
-        rw[if_neg] at hl
+        rw [if_neg] at hl
         · simp at hl
-          rw[<- mem_of_check_stick]
+          simp_rw [<- mem_of_check_stick]
           have hl := hl.1
-          rw[<- mem_of_check_stick] at hl
-          change f a ∉ List.map f (b :: l)
+          simp_rw [<- mem_of_check_stick] at hl
+          rw [← List.map_cons]
+          suffices f a ∉ List.map f (b :: l) by
+            rintro x hx rfl
+            exact this hx
           rw[List.mem_map_of_injective ]
-          exact hl
+          intro ha
+          simpa using hl a ha
           exact Function.Bijective.injective hf
         · simp
           exact fun a_1 => h (congrArg f a_1)
@@ -629,10 +633,10 @@ theorem sort_expand [LinearOrder X] (l : List (X × Nat)) :
   have lhs_sorted := sorted_expand_sorted this
   rw[mergeSort_lt_le_eq_List_X_Nat] at lhs_sorted
   unfold List.sort
-  have rhs_sorted := (expand l).sorted_mergeSort (α := X) (· ≤ ·)
-  have  := List.mergeSort_perm l (fun x x_1 => x.1 ≤ x_1.1)
+  have rhs_sorted := (expand l).sorted_mergeSort'' (α := X) (· ≤ ·)
+  have  := List.mergeSort_perm (fun x x_1 => x.1 ≤ x_1.1) l
   have perm_rhs_lhs := perm_expand this
-  have := List.mergeSort_perm (expand l) (· ≤ · )
+  have := List.mergeSort_perm (· ≤ · ) (expand l)
   apply List.Perm.symm at this
   have perm_rhs_lhs := List.Perm.trans perm_rhs_lhs this
   have h := List.eq_of_perm_of_sorted perm_rhs_lhs lhs_sorted rhs_sorted
@@ -656,7 +660,7 @@ lemma countAux_perm_of_stick {L : List X} [LinearOrder X] (hL : Sticking L) :
     (countAux' L).Perm (countAux' (List.sort L)) := by
   obtain ⟨l, rfl, hl, hne0⟩ := L.exists_eq_expand
   have h_perm : List.Perm (List.mergeSort (fun x x_1 => x.1 < x_1.1) l) l := by
-    apply List.perm_mergeSort
+    apply List.mergeSort_perm
   rw [sort_expand l]
   dsimp
   rw [countAux'_expand]

@@ -1,6 +1,5 @@
 import Matroids.PartialMatroid
 import Matroids.Count
-import Mathlib.Util.Time
 
 /-! # Code to group check for repeat PartialMatroids based on permutations
 
