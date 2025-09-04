@@ -59,3 +59,14 @@ lemma mergeSort_of_perm_eq {L₁ L₂ : List X} (P : X → X → Bool) (hL : L�
 lemma mergeSort_sorted_list_X_Nat [LinearOrder X] (l : List (X × Nat)) :
     (l.mergeSort (fun (x1, n1) (x2, n2) ↦ x1 ≤ x2)).Sorted (fun (x1, _) (x2, _) ↦ x1 ≤ x2) := by
   sorry
+
+
+
+
+lemma sorted_mergeSort_general (f : α → β) [LinearOrder β] (l : List α) :
+    (l.mergeSort (fun x1 x2 => f x1 < f x2)).Sorted (fun x1 x2 => f x1 ≤ f x2) := by
+  sorry
+
+lemma sorted_mergeSort_general' (f : α → β) [LinearOrder β] (l : List α) :
+    (l.mergeSort (fun x1 x2 => f x1 ≤ f x2)).Sorted (fun x1 x2 => f x1 ≤ f x2) := by
+  sorry

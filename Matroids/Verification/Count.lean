@@ -68,17 +68,94 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
   simp [List.forall_iff_forall_mem] at H
   exact H hA
 
+#check Unique
 
-theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
-    {i j : Fin (groupByValue (A.mergeSort (f · ≤ f ·)) f).length}
+theorem lt_of_groupByValueAux_Sorted {X : Type u_1} {A : List PartialMatroid} {f : PartialMatroid → X} [inst : LinearOrder X]
+    {i j : Fin (List.length ((groupByValueAux f A).1 :: (groupByValueAux f A).2))} (h : i < j) {x y : PartialMatroid}
+    (hx : x ∈ List.get ((groupByValueAux f A).1 :: (groupByValueAux f A).2) i)
+    (hy : y ∈ List.get ((groupByValueAux f A).1 :: (groupByValueAux f A).2) j)
+    (hA : List.Sorted (fun x1 x2 => f x1 ≤ f x2) A) : f x < f y := by
+  simp at hx hy
+  match A with
+  | [] =>
+    unfold groupByValueAux at hx
+    simp at hx
+  | [a] =>
+    simp at i j
+    change Fin (1) at i
+    change Fin (1) at j
+    have hij : i = j := Subsingleton.elim i j
+    have h := h.ne
+    contradiction
+    -- change x ∈ ([a] :: [])[↑i] at hx
+    -- set P := groupByValueAux f [a] with hP
+  | a :: b :: A =>
+    sorry
+    -- unfold groupByValueAux at hx hy
+    -- let P := (f a == f b) = true
+    -- have H : P = true := sorry
+    -- change Fin (List.length (List.cons (Prod.fst (ite P _ _)) (Prod.snd (ite P _ _)))) at i
+    -- change Fin (List.length (List.cons (Prod.fst (ite _ _ _)) (Prod.snd (ite _ _ _)))) at j
+    -- simp at hx hy
+    -- simp_rw [← beq_iff_eq (a := f a) (b := f b)] at hx hy
+    -- -- split_ifs at i with hab
+    -- clear_value P
+    -- subst P
+    -- subst H
+    -- by_cases hab : (f a == f b) = true
+    -- -- <;> split at i <;> split at j <;> rename_i hab' hab'' <;> rw [beq_iff_eq] at hab' hab'' <;> try tauto
+    -- · simp_rw [if_pos hab] at hx hy
+    --   have ih := lt_of_groupByValueAux_Sorted (X := X) (A := ( b :: A))
+    --   sorry
+    -- · simp_rw [if_neg hab] at hx hy
+    --   sorry
+
+#check List.Sorted.get_strictMono
+
+theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {i j : Fin (groupByValue A f).length}
+    (h : i < j) {x y : PartialMatroid}
+    (hx : x ∈ (groupByValue A f).get i)
+    (hy : y ∈ (groupByValue A f).get j)
+    (hA : A.Sorted (fun x1 x2 => (f x1) ≤ (f x2))):
+    f x < f y := by
+  unfold groupByValue at hx hy
+  simp at hx hy
+  exact lt_of_groupByValueAux_Sorted h hx hy hA
+
+--UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
+theorem ne_of_groupByValue'_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {i j : Fin (groupByValue A f).length}
     (h : i ≠ j) {x y : PartialMatroid}
-    (hx : x ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get i)
-    (hy : y ∈ (groupByValue (A.mergeSort (f · ≤ f ·)) f).get j) :
+    (hx : x ∈ (groupByValue A f).get i)
+    (hy : y ∈ (groupByValue A f).get j)
+    (hA : A.Sorted (fun x1 x2 => (f x1) ≤ (f x2))):
     f x ≠ f y := by
   contrapose! h
-  -- unfold groupByValue at hx hy
-  -- simp at hx hy
-  sorry
+  obtain hij | hij | hij := (lt_trichotomy i j)
+  · have := lt_of_groupByValue_Sorted hij hx hy hA
+    have := this.ne
+    contradiction
+  · exact hij
+  · have := lt_of_groupByValue_Sorted hij hy hx hA
+    have := this.ne.symm
+    contradiction
+
+
+theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {i j : Fin (groupByValue (A.mergeSort (f · ≤  f ·)) f).length}
+    (h : i ≠ j) {x y : PartialMatroid}
+    (hx : x ∈ (groupByValue (A.mergeSort (f · ≤  f ·)) f).get i)
+    (hy : y ∈ (groupByValue (A.mergeSort (f · ≤  f ·)) f).get j) :
+    f x ≠ f y := by
+  apply ne_of_groupByValue'_Sorted
+  · exact h
+  · exact hx
+  · exact hy
+  apply sorted_mergeSort_general'
+
+
+
 
 lemma countAux_of_map {L : List X} [LinearOrder X] {f : X → X} (ha : f.Bijective):
     countAux L = countAux (L.map f):= by
