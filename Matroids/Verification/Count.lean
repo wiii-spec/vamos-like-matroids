@@ -68,7 +68,6 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
   simp [List.forall_iff_forall_mem] at H
   exact H hA
 
-#check Unique
 
 theorem lt_of_groupByValueAux_Sorted {X : Type u_1} {A : List PartialMatroid} {f : PartialMatroid → X} [inst : LinearOrder X]
     {i j : Fin (List.length ((groupByValueAux f A).1 :: (groupByValueAux f A).2))} (h : i < j) {x y : PartialMatroid}
@@ -111,6 +110,40 @@ theorem lt_of_groupByValueAux_Sorted {X : Type u_1} {A : List PartialMatroid} {f
     --   sorry
 
 #check List.Sorted.get_strictMono
+
+
+
+lemma groupByValue_nonempty {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {i : Fin (groupByValue A f).length}
+    (hA : A ≠ []):
+    (groupByValue A f)[i] ≠ [] := by sorry
+
+
+lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
+    {i : Fin (groupByValue A f).length}
+    {x : PartialMatroid}
+    (hx : x ∈ (groupByValue A f).get i)
+    (hA : A ≠ []):
+    f ((groupByValue A f)[i].head (groupByValue_nonempty hA))= f x := by
+  simp
+  match A with
+  | [] =>
+    contradiction
+  | [a] =>
+    simp
+    unfold groupByValue at ⊢ hx
+    simp at ⊢ hx
+    simp_rw[groupByValueAux ] at ⊢ hx
+    simp at ⊢ hx
+    exact congrArg f (id (Eq.symm hx))
+  | a :: b :: l =>
+    sorry
+
+
+-- lemma groupByValue_Sorted (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
+--     (hA : A ≠ []):
+    -- List.Sorted (· < · ) (List.map (f ∘ (List.head )) (groupByValue (X := X) A f) ) := by sorry
+
 
 theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
     {i j : Fin (groupByValue A f).length}
