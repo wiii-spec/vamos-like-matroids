@@ -119,6 +119,13 @@ lemma groupByValue_nonempty {A : List PartialMatroid} {f: PartialMatroid → X} 
     (groupByValue A f)[i] ≠ [] := by sorry
 
 
+lemma groupByValue_nonempty' {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+    {a : List PartialMatroid}
+    (ha : a ∈ groupByValue A f)
+    (hA : A ≠ []):
+    a ≠ [] := by sorry
+
+
 lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
     {i : Fin (groupByValue A f).length}
     {x : PartialMatroid}
@@ -142,7 +149,8 @@ lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [Lin
 
 -- lemma groupByValue_Sorted (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
 --     (hA : A ≠ []):
-    -- List.Sorted (· < · ) (List.map (f ∘ (List.head )) (groupByValue (X := X) A f) ) := by sorry
+
+--     List.Sorted (· < · ) (List.map (f ∘ (List.head _ (groupByValue_nonempty' hA))) (groupByValue (X := X) A f) ) := by sorry
 
 
 theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
