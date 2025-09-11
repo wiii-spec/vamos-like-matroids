@@ -213,29 +213,42 @@ directly in the main computation.-/
 partial matroids.
 (will probably get used for Theorem 3) -/
 
-lemma nonisomorphic_groupByinvariant1_2 (A : List PartialMatroid) :
-    (((groupByFirstInvariant A).map) (groupBySecondInvariant)).flatten.Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-  simp
-  have := nonisomorphic_groupByFirstInvariant
-  let P (L1 L2 : List PartialMatroid) : Prop := List.Forall (fun M₁ => List.Forall (fun M₂ => permutationsComparison 8 M₁.matroid M₂.matroid = false) L2) L1
-  match (groupByFirstInvariant A) with
-  | [] => simp
-  | a :: l =>
-    have ih := nonisomorphic_groupByinvariant1_2 l.flatten
-    simp at ih this
-    change List.Pairwise P (groupBySecondInvariant a ++ (List.map groupBySecondInvariant l).flatten)
-    change List.Pairwise P (List.map groupBySecondInvariant (groupByFirstInvariant l.flatten)).flatten at ih
-    change ∀ (A : List PartialMatroid), List.Pairwise P (groupByFirstInvariant A) at this
-    rw[List.pairwise_append]
-    constructor
-    · have ha := nonisomorphic_groupBySecondInvariant a
-      simp at ha
-      change List.Pairwise P (groupBySecondInvariant a) at ha
-      exact ha
-    · constructor
-      · sorry
-      · sorry
+lemma pairwise_trans (P : List α → List α → Prop)
+    {f₁ f₂ : List α → List (List α)}
+    (hf₁ : ∀ A : List α, (f₁ A).Pairwise P)
+    (hf₂ : ∀ A : List α, (f₂ A).Pairwise P) :
+    List.Pairwise P (List.map f₂ (f₁ A)).flatten  := by
+  sorry
+
+
+
+-- lemma nonisomorphic_groupByinvariant1_2 (A : List PartialMatroid) :
+--     (((groupByFirstInvariant A).map) (groupBySecondInvariant)).flatten.Pairwise fun L₁ L₂ ↦
+--       L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+--   have := nonisomorphic_groupByFirstInvariant
+--   simp at this ⊢
+--   let P (L1 L2 : List PartialMatroid) : Prop := List.Forall (fun M₁ => List.Forall (fun M₂ => permutationsComparison 8 M₁.matroid M₂.matroid = false) L2) L1
+--   change ∀ (A : List PartialMatroid),List.Pairwise P (groupByFirstInvariant A) at this
+--   change List.Pairwise P (List.map groupBySecondInvariant (groupByFirstInvariant A)).flatten
+
+
+--   match (groupByFirstInvariant A) with
+--   | [] => simp
+--   | a :: l =>
+--     have ih := nonisomorphic_groupByinvariant1_2 l.flatten
+--     simp at ih this
+--     change List.Pairwise P (groupBySecondInvariant a ++ (List.map groupBySecondInvariant l).flatten)
+--     change List.Pairwise P (List.map groupBySecondInvariant (groupByFirstInvariant l.flatten)).flatten at ih
+--     change ∀ (A : List PartialMatroid), List.Pairwise P (groupByFirstInvariant A) at this
+--     rw[List.pairwise_append]
+--     constructor
+--     · have ha := nonisomorphic_groupBySecondInvariant a
+--       simp at ha
+--       change List.Pairwise P (groupBySecondInvariant a) at ha
+--       exact ha
+--     · constructor
+--       · sorry
+--       · sorry
 
 
 

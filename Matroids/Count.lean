@@ -59,23 +59,28 @@ by their characteristic obtained from running them through a mapping function. I
 looking for partial matroids that returns the same value through the function and puts them into
 a list. If another partial matroid returns a different vlue through the function, then a new list is
 created-/
-def groupByValueAux [LinearOrder X] (f: PartialMatroid → X) : List PartialMatroid → (List PartialMatroid) × List (List PartialMatroid)
-   | [] => ([], []) -- check
-   | [pm] => ([pm], []) -- check
+def groupByValueAux [Inhabited X] [LinearOrder X] (f: PartialMatroid → X) : List PartialMatroid → (X × List PartialMatroid) × List (X × List PartialMatroid)
+   | [] => ((default, []), []) -- check
+   | [pm] => ((f pm, [pm]), []) -- check
    | a :: b :: t =>
-      let (c, finishedCount) := groupByValueAux f (b :: t)
+      let ((v, c), finishedCount) := groupByValueAux f (b :: t)
       if f a == f b then
-         (a :: c, finishedCount)
+         ((v, a :: c), finishedCount)
       else
-         ([a], c :: finishedCount)
+         ((f a, [a]), (v, c) :: finishedCount)
 
 
 /--Puts the list differentiated by category togethr into a list of lists. In the end, it becomes
 a list of list of partil matroids. -/
-def groupByValue [LinearOrder X] (l: List PartialMatroid) (f: PartialMatroid → X) : List (List PartialMatroid) :=
+def groupByValue [Inhabited X] [LinearOrder X] (l: List PartialMatroid) (f: PartialMatroid → X) : List (List PartialMatroid) :=
    let (c, finishedCount) := groupByValueAux f l
-   (c::finishedCount)
+   (c::finishedCount).map Prod.snd
 
+/--Puts the list differentiated by category togethr into a list of lists. In the end, it becomes
+a list of list of partil matroids. -/
+def groupByValue_values [Inhabited X] [LinearOrder X] (l: List PartialMatroid) (f: PartialMatroid → X) : List X :=
+   let (c, finishedCount) := groupByValueAux f l
+   (c::finishedCount).map Prod.fst
 
 
 --stick: all elements with the same value are consecutive to each other

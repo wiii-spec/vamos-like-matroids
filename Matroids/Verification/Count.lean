@@ -11,7 +11,7 @@ the output will be a list of natural numbers that counts the single ocurrences o
 paving matroids-/
 
 lemma forall_groupByValueAux (f : α → List ℕ) (A : List α) (hA : A.Forall P) :
-    (groupByValueAux f A).1.Forall P ∧ (groupByValueAux f A).2.Forall (fun l ↦ l.Forall P) := by
+    (groupByValueAux f A).1.2.Forall P ∧ (groupByValueAux f A).2.Forall (fun l ↦ l.2.Forall P) := by
   match A with
   | [] => simp [groupByValueAux]
   | [pm] =>
@@ -69,103 +69,192 @@ lemma mem_groupByValue (P : α → Prop) (f : α → List ℕ) (A : List α) (hA
   exact H hA
 
 
-theorem lt_of_groupByValueAux_Sorted {X : Type u_1} {A : List PartialMatroid} {f : PartialMatroid → X} [inst : LinearOrder X]
-    {i j : Fin (List.length ((groupByValueAux f A).1 :: (groupByValueAux f A).2))} (h : i < j) {x y : PartialMatroid}
-    (hx : x ∈ List.get ((groupByValueAux f A).1 :: (groupByValueAux f A).2) i)
-    (hy : y ∈ List.get ((groupByValueAux f A).1 :: (groupByValueAux f A).2) j)
-    (hA : List.Sorted (fun x1 x2 => f x1 ≤ f x2) A) : f x < f y := by
-  simp at hx hy
+
+-----
+
+
+
+lemma groupByValueAux_head_head {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
+    {b : PartialMatroid} :
+    (groupByValueAux f (b :: A)).1.1 = f b := by
   match A with
   | [] =>
-    unfold groupByValueAux at hx
-    simp at hx
-  | [a] =>
-    simp at i j
-    change Fin (1) at i
-    change Fin (1) at j
-    have hij : i = j := Subsingleton.elim i j
-    have h := h.ne
-    contradiction
-    -- change x ∈ ([a] :: [])[↑i] at hx
-    -- set P := groupByValueAux f [a] with hP
-  | a :: b :: A =>
-    sorry
-    -- unfold groupByValueAux at hx hy
-    -- let P := (f a == f b) = true
-    -- have H : P = true := sorry
-    -- change Fin (List.length (List.cons (Prod.fst (ite P _ _)) (Prod.snd (ite P _ _)))) at i
-    -- change Fin (List.length (List.cons (Prod.fst (ite _ _ _)) (Prod.snd (ite _ _ _)))) at j
-    -- simp at hx hy
-    -- simp_rw [← beq_iff_eq (a := f a) (b := f b)] at hx hy
-    -- -- split_ifs at i with hab
-    -- clear_value P
-    -- subst P
-    -- subst H
-    -- by_cases hab : (f a == f b) = true
-    -- -- <;> split at i <;> split at j <;> rename_i hab' hab'' <;> rw [beq_iff_eq] at hab' hab'' <;> try tauto
-    -- · simp_rw [if_pos hab] at hx hy
-    --   have ih := lt_of_groupByValueAux_Sorted (X := X) (A := ( b :: A))
-    --   sorry
-    -- · simp_rw [if_neg hab] at hx hy
-    --   sorry
-
-#check List.Sorted.get_strictMono
-
-
-
-lemma groupByValue_nonempty {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
-    {i : Fin (groupByValue A f).length}
-    (hA : A ≠ []):
-    (groupByValue A f)[i] ≠ [] := by sorry
-
-
-lemma groupByValue_nonempty' {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
-    {a : List PartialMatroid}
-    (ha : a ∈ groupByValue A f)
-    (hA : A ≠ []):
-    a ≠ [] := by sorry
-
-
-lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
-    {i : Fin (groupByValue A f).length}
-    {x : PartialMatroid}
-    (hx : x ∈ (groupByValue A f).get i)
-    (hA : A ≠ []):
-    f ((groupByValue A f)[i].head (groupByValue_nonempty hA))= f x := by
-  simp
-  match A with
-  | [] =>
-    contradiction
-  | [a] =>
+    unfold groupByValueAux
     simp
-    unfold groupByValue at ⊢ hx
-    simp at ⊢ hx
-    simp_rw[groupByValueAux ] at ⊢ hx
-    simp at ⊢ hx
-    exact congrArg f (id (Eq.symm hx))
-  | a :: b :: l =>
-    sorry
+  | c :: A =>
+    unfold groupByValueAux
+    simp
+    by_cases h : f b = f c
+    · rw[if_pos h]
+      simp
+      have : (groupByValueAux f (c :: A)).1.1 = f c := by
+        apply groupByValueAux_head_head
+      rw[this, h]
+    · rw[if_neg h]
 
 
--- lemma groupByValue_Sorted (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
---     (hA : A ≠ []):
+lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
+    {l : List PartialMatroid} {x : X}
+    (h : (x, l) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2) :
+    ∀ M ∈ l, f M = x := by
+  match A with
+  | [] =>
+    unfold groupByValueAux at h
+    simp at h
+    rw[h.2]
+    simp
+  | [a] =>
+    unfold groupByValueAux at h
+    simp at h
+    rw[h.2, h.1]
+    simp
+  | a :: b :: A =>
+    unfold groupByValueAux at h
+    simp at h
+    by_cases hab : f a = f b
+    · rw[if_pos hab] at h
+      -- have ih := groupByValue_head (b :: A) (f := f) _ _
+      obtain h | h := h
+      · simp at h
+        obtain ⟨rfl, rfl⟩ := h
+        intro M hM
+        simp at hM
+        obtain hM | hM := hM
+        · rw[hM, hab]
+          rw[groupByValueAux_head_head]
+        · have : ((groupByValueAux f (b :: A)).1.1, (groupByValueAux f (b :: A)).1.2) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
+            simp
+          simp_rw[groupByValueAux_head_head] at this ⊢
+          have ih := groupByValue_head (b :: A) (f := f) this
+          specialize ih M hM
+          exact ih
+      · simp at h
+        have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
+          simp
+          right
+          exact h
+        have ih := groupByValue_head (b :: A) (f := f) this
+        exact ih
+    · rw[if_neg hab] at h
+      simp at h
+      obtain h | h  := h
+      · rw[h.1, h.2]
+        simp
+      · obtain h | h := h
+        · have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
+            simp
+            left
+            exact h
+          have ih := groupByValue_head (b :: A) (f := f) this
+          exact ih
+        · have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
+            simp
+            right
+            exact h
+          have ih := groupByValue_head (b :: A) (f := f) this
+          exact ih
 
---     List.Sorted (· < · ) (List.map (f ∘ (List.head _ (groupByValue_nonempty' hA))) (groupByValue (X := X) A f) ) := by sorry
 
 
-theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+lemma groupByValue_values_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
+    (hA : A.Sorted (fun x1 x2 => (f x1) ≤ (f x2))):
+
+    List.Sorted (· < · ) (groupByValue_values A f) := by
+  match A with
+  | [] =>
+    unfold groupByValue_values groupByValueAux
+    simp
+  | [a] =>
+    unfold groupByValue_values groupByValueAux
+    simp
+  | a :: b :: A =>
+    unfold groupByValue_values groupByValueAux
+    simp
+    have : List.Sorted (fun x1 x2 => f x1 ≤ f x2) (b :: A) := by
+      simp at hA
+      simp
+      constructor
+      · exact hA.2.1
+      · exact hA.2.2
+    have ih := groupByValue_values_Sorted this
+    unfold groupByValue_values at ih
+    simp at ih
+    by_cases h : f a = f b
+    · rw[if_pos h]
+      simp
+      exact ih
+    · rw[if_neg h]
+      simp
+      constructor
+      · intro x l hxl
+        have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
+          simp
+          exact hxl
+        apply groupByValue_head at this
+        obtain hxl | hxl := hxl
+        · have hx : x = f b := by
+            rw[<- groupByValueAux_head_head (b := b) (A := A) (f := f)]
+            contrapose! hxl
+            exact ne_of_apply_ne Prod.fst fun a => id (Ne.symm hxl) (id (Eq.symm a))
+          rw[hx]
+          simp at hA
+          exact lt_of_le_of_ne hA.1.1 h
+        · obtain ⟨ ih1, ih2 ⟩ := ih
+          specialize ih1 x l hxl
+          rw[groupByValueAux_head_head] at ih1
+          simp at hA h
+          exact lt_trans (lt_of_le_of_ne hA.1.1 h) ih1
+      · exact ih
+
+
+
+theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     {i j : Fin (groupByValue A f).length}
     (h : i < j) {x y : PartialMatroid}
     (hx : x ∈ (groupByValue A f).get i)
     (hy : y ∈ (groupByValue A f).get j)
     (hA : A.Sorted (fun x1 x2 => (f x1) ≤ (f x2))):
     f x < f y := by
-  unfold groupByValue at hx hy
+  -- unfold groupByValue at hx hy
   simp at hx hy
-  exact lt_of_groupByValueAux_Sorted h hx hy hA
+  apply groupByValue_values_Sorted at hA
+  apply List.Sorted.get_strictMono at hA
+  have length_byvalue_byvaluevalue : (groupByValue A f).length = (groupByValue_values A f).length := by
+    unfold groupByValue groupByValue_values
+    simp
+  have mono : (groupByValue_values A f).get (i.cast length_byvalue_byvaluevalue) < (groupByValue_values A f).get (j.cast length_byvalue_byvaluevalue) := by
+    rw[StrictMono.lt_iff_lt hA]
+    exact h
+  simp at mono
+  have mem_i : ((groupByValue_values A f)[↑i], ((groupByValue A f).get (i))) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2 := by
+    conv =>
+      rhs
+      unfold groupByValue groupByValue_values
+      simp
+
+
+    -- apply List.get_mem
+    sorry
+  apply groupByValue_head at mem_i
+  have mem_j : ((groupByValue_values A f)[↑j], ((groupByValue A f).get (j))) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2 := by
+    conv =>
+      rhs
+      unfold groupByValue groupByValue_values
+      simp
+
+    -- apply List.get_mem
+    sorry
+  apply groupByValue_head at mem_j
+  specialize mem_i x hx
+  specialize mem_j y hy
+  rw[mem_i, mem_j]
+  exact mono
+  -- have : List.Sorted.get_strictMono groupByValue_values_Sorted
+  -- sorry
+
 
 --UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
-theorem ne_of_groupByValue'_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+theorem ne_of_groupByValue'_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     {i j : Fin (groupByValue A f).length}
     (h : i ≠ j) {x y : PartialMatroid}
     (hx : x ∈ (groupByValue A f).get i)
@@ -183,7 +272,7 @@ theorem ne_of_groupByValue'_Sorted {A : List PartialMatroid} {f: PartialMatroid 
     contradiction
 
 
-theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X]
+theorem ne_of_groupByValue {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     {i j : Fin (groupByValue (A.mergeSort (f · ≤  f ·)) f).length}
     (h : i ≠ j) {x y : PartialMatroid}
     (hx : x ∈ (groupByValue (A.mergeSort (f · ≤  f ·)) f).get i)
@@ -813,7 +902,7 @@ lemma count_of_sort_map (L : List (List X)) {f : X → X} (hf : f.Bijective) [Li
 
 lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} {f : PartialMatroid → List ℕ}
     (h1 : A ∈ lA)
-    (h2 : lA = (groupByValueAux f lB).1 ∨ lA ∈ (groupByValueAux f lB).2) :
+    (h2 : lA = (groupByValueAux f lB).1.2 ∨ lA ∈ (groupByValueAux f lB).2.map Prod.snd) :
     A ∈ lB := by
   unfold groupByValueAux at h2
   match lB with
@@ -837,7 +926,7 @@ lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} 
         simp
       · rw [List.mem_cons]
         right
-        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1.2)
         · exact h1
         · left
           rfl
@@ -847,17 +936,19 @@ lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} 
       apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
       · exact h1
       · right
+        simp
         exact h2
     · simp at h2
-      obtain h2 | h2 | h2 := h2
+      obtain h2 | h2 := h2
       · subst h2
         simp at h1
         rw[h1]
         simp
+      obtain ⟨a, h2 | h2⟩ := h2
       · rw [List.mem_cons]
         right
-        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1)
-        · subst h2
+        apply mem_of_groupByValueAux (lB := b ::l) (lA := (groupByValueAux f (b :: l)).1.2)
+        · simp_rw [← h2]
           exact h1
         · left
           rfl
@@ -866,7 +957,8 @@ lemma mem_of_groupByValueAux {A : PartialMatroid} {lA lB : List PartialMatroid} 
         apply mem_of_groupByValueAux (lB := b ::l) ( lA := lA) (f := f)
         · exact h1
         · right
-          exact h2
+          simp
+          use a
 
 
 lemma mem_of_groupByValue {A :PartialMatroid} {lA lB: List PartialMatroid} {f : PartialMatroid → List Nat}
@@ -875,4 +967,10 @@ lemma mem_of_groupByValue {A :PartialMatroid} {lA lB: List PartialMatroid} {f : 
     A ∈ lB := by
   unfold groupByValue at h2
   simp at h2
-  exact mem_of_groupByValueAux h1 h2
+  apply mem_of_groupByValueAux h1 (f := f)
+  obtain h2 | h2 := h2
+  · left
+    exact h2
+  · right
+    simp
+    exact h2
