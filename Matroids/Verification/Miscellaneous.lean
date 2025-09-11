@@ -70,8 +70,13 @@ theorem List.pairwise_range {R : ℕ → ℕ → Prop} (H : ∀ i j, i < j → R
   · exact pairwise_lt_range
 
 
-lemma List.Forall.perm {L₁ L₂ :List X} {P : X → Prop } (hL : L₁.Perm L₂)
+lemma List.Forall.perm {L₁ L₂ : List X} {P : X → Prop } (hL : L₁.Perm L₂)
     (hp: L₁.Forall P) :
     L₂.Forall P := by
   -- apply?
+  sorry
+
+theorem List.get_mem_zip {X Y : Type*} {L : List X} {M : List Y} (h : L.length = M.length)
+    (i : Fin M.length) :
+    (L[i], M[i]) ∈ L.zip M := by
   sorry

@@ -93,7 +93,7 @@ lemma groupByValueAux_head_head {A : List PartialMatroid} {f: PartialMatroid →
     · rw[if_neg h]
 
 
-lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
+lemma groupByValueAux_head (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     {l : List PartialMatroid} {x : X}
     (h : (x, l) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2) :
     ∀ M ∈ l, f M = x := by
@@ -125,7 +125,7 @@ lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [Lin
         · have : ((groupByValueAux f (b :: A)).1.1, (groupByValueAux f (b :: A)).1.2) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
             simp
           simp_rw[groupByValueAux_head_head] at this ⊢
-          have ih := groupByValue_head (b :: A) (f := f) this
+          have ih := groupByValueAux_head (b :: A) (f := f) this
           specialize ih M hM
           exact ih
       · simp at h
@@ -133,7 +133,7 @@ lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [Lin
           simp
           right
           exact h
-        have ih := groupByValue_head (b :: A) (f := f) this
+        have ih := groupByValueAux_head (b :: A) (f := f) this
         exact ih
     · rw[if_neg hab] at h
       simp at h
@@ -145,16 +145,28 @@ lemma groupByValue_head (A : List PartialMatroid) {f: PartialMatroid → X} [Lin
             simp
             left
             exact h
-          have ih := groupByValue_head (b :: A) (f := f) this
+          have ih := groupByValueAux_head (b :: A) (f := f) this
           exact ih
         · have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
             simp
             right
             exact h
-          have ih := groupByValue_head (b :: A) (f := f) this
+          have ih := groupByValueAux_head (b :: A) (f := f) this
           exact ih
 
 
+lemma groupByValue_values_zip_groupByValue (A : List PartialMatroid) (f : PartialMatroid → X)
+    [LinearOrder X] [Inhabited X] :
+    (groupByValue_values A f).zip (groupByValue A f)
+    = ((groupByValueAux f A).1 :: (groupByValueAux f A).2) := by
+  sorry
+
+lemma eval_of_mem_groupByValue (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
+    [Inhabited X] {l : List PartialMatroid} {x : X}
+    (h : (x, l) ∈ (groupByValue_values A f).zip (groupByValue A f)) :
+    ∀ M ∈ l, f M = x := by
+  rw [groupByValue_values_zip_groupByValue] at h
+  exact groupByValueAux_head _ h
 
 lemma groupByValue_values_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     (hA : A.Sorted (fun x1 x2 => (f x1) ≤ (f x2))):
@@ -176,6 +188,8 @@ lemma groupByValue_values_Sorted {A : List PartialMatroid} {f: PartialMatroid �
       constructor
       · exact hA.2.1
       · exact hA.2.2
+    -- TODO: can you rephrase this proof to use only `groupByValue` and `groupByValue_values`, not
+    -- the `Aux` function? (and to use `eval_of_mem_groupByValue` rather than `groupByValueAux_head`)
     have ih := groupByValue_values_Sorted this
     unfold groupByValue_values at ih
     simp at ih
@@ -190,7 +204,7 @@ lemma groupByValue_values_Sorted {A : List PartialMatroid} {f: PartialMatroid �
         have : (x, l) ∈ (groupByValueAux f (b :: A)).1 :: (groupByValueAux f (b :: A)).2 := by
           simp
           exact hxl
-        apply groupByValue_head at this
+        apply groupByValueAux_head at this
         obtain hxl | hxl := hxl
         · have hx : x = f b := by
             rw[<- groupByValueAux_head_head (b := b) (A := A) (f := f)]
@@ -207,6 +221,11 @@ lemma groupByValue_values_Sorted {A : List PartialMatroid} {f: PartialMatroid �
       · exact ih
 
 
+theorem length_groupByValue_values (A : List PartialMatroid) (f : PartialMatroid → X)
+    [LinearOrder X] [Inhabited X] :
+    (groupByValue A f).length = (groupByValue_values A f).length := by
+  unfold groupByValue groupByValue_values
+  simp
 
 theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid → X} [LinearOrder X] [Inhabited X]
     {i j : Fin (groupByValue A f).length}
@@ -219,38 +238,28 @@ theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid �
   simp at hx hy
   apply groupByValue_values_Sorted at hA
   apply List.Sorted.get_strictMono at hA
-  have length_byvalue_byvaluevalue : (groupByValue A f).length = (groupByValue_values A f).length := by
-    unfold groupByValue groupByValue_values
-    simp
-  have mono : (groupByValue_values A f).get (i.cast length_byvalue_byvaluevalue) < (groupByValue_values A f).get (j.cast length_byvalue_byvaluevalue) := by
+  have length_byvalue_byvaluevalue : (groupByValue A f).length = (groupByValue_values A f).length :=
+    length_groupByValue_values ..
+  let castLen (i : Fin (groupByValue A f).length) : Fin (groupByValue_values A f).length :=
+    i.cast length_byvalue_byvaluevalue
+  have mono : (groupByValue_values A f).get (castLen i) < (groupByValue_values A f).get (castLen j) := by
     rw[StrictMono.lt_iff_lt hA]
     exact h
   simp at mono
-  have mem_i : ((groupByValue_values A f)[↑i], ((groupByValue A f).get (i))) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2 := by
-    conv =>
-      rhs
-      unfold groupByValue groupByValue_values
-      simp
-
-
-    -- apply List.get_mem
-    sorry
-  apply groupByValue_head at mem_i
-  have mem_j : ((groupByValue_values A f)[↑j], ((groupByValue A f).get (j))) ∈ (groupByValueAux f A).1 :: (groupByValueAux f A).2 := by
-    conv =>
-      rhs
-      unfold groupByValue groupByValue_values
-      simp
-
-    -- apply List.get_mem
-    sorry
-  apply groupByValue_head at mem_j
+  have mem_i : ((groupByValue_values A f)[i], (groupByValue A f)[i])
+      ∈ (groupByValue_values A f).zip (groupByValue A f) := by
+    apply List.get_mem_zip
+    exact length_byvalue_byvaluevalue.symm
+  apply eval_of_mem_groupByValue at mem_i
+  have mem_j : ((groupByValue_values A f)[j], (groupByValue A f)[j])
+      ∈ (groupByValue_values A f).zip (groupByValue A f) := by
+    apply List.get_mem_zip
+    exact length_byvalue_byvaluevalue.symm
+  apply eval_of_mem_groupByValue at mem_j
   specialize mem_i x hx
   specialize mem_j y hy
   rw[mem_i, mem_j]
   exact mono
-  -- have : List.Sorted.get_strictMono groupByValue_values_Sorted
-  -- sorry
 
 
 --UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
