@@ -146,126 +146,6 @@ lemma groupByBucket_vamosLike (lA : List PartialMatroid)
 --     (hA : )
 
 
-
-
------prove group by bucket_nonisomorphic
-
-
-lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
-  (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant1 M₁ = invariant1 M₂ := by
-  unfold sameUpToRelabelling at hb
-  simp at hb
-  unfold invariant1
-  have h := @count_of_relabelling M₂.matroid f ha
-  rw[hb] at h
-  rw[sort_flatten_sort] at h
-  rw[sort_flatten_map_sort] at h
-  apply h
-  -- hopefully follows from count_of_relabelling?
-
-
-lemma invariant1_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
-    invariant1 M₁ = invariant1 M₂ := by
-  unfold permutationsComparison at h
-  simp at h
-  obtain ⟨ f, ha,hb ⟩  := h
-  apply invariant1_of_sameUpTolabelling ha hb
-
-
-lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
-    (groupByFirstInvariant A).Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-
-    unfold groupByFirstInvariant
-    rw [List.pairwise_iff_get]
-    intro i j h
-    rw[List.forall_iff_forall_mem]
-    intro x hx
-    rw[List.forall_iff_forall_mem]
-    intro y hy
-    suffices h : invariant1 x ≠ invariant1 y by
-      contrapose! h
-      apply invariant1_of_isomorphic
-      exact h
-    exact ne_of_groupByValue h.ne hx hy
-
-  -- Fin (List.length (groupByValue (List.mergeSort (fun l1 l2 => invariant1 l1 < invariant1 l2) A) invariant1))
-  -- Fin (List.length (groupByValue (List.mergeSort (fun x x_1 => invariant1 x < invariant1 x_1) A) invariant1))
-
---invariant 3 non_isomorphic
-lemma nonisomorphic_groupByThirdInvariant (A : List PartialMatroid) :
-    (groupByThirdInvariant A).Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-  sorry
-
-lemma nonisomorphic_groupBySecondInvariant (A : List PartialMatroid) :
-    (groupBySecondInvariant A).Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-  sorry
-
-/- Lemma for countBuckets (related to Theorem 1): If the input is an list partial matroids
-(order does matter, for both the lishfts and for the members) with range i < n and lenght = r, then
-the output will be a lawful sparse paving matroid -/
-/- After rethinking, we might not need to prove anything about countBuckets since it is not used
-directly in the main computation.-/
-
-/-- For all partial matroids in a bucket, they do not exist in other buckets even as permutations of
-partial matroids.
-(will probably get used for Theorem 3) -/
-
-lemma pairwise_trans (P : List α → List α → Prop)
-    {f₁ f₂ : List α → List (List α)}
-    (hf₁ : ∀ A : List α, (f₁ A).Pairwise P)
-    (hf₂ : ∀ A : List α, (f₂ A).Pairwise P) :
-    List.Pairwise P (List.map f₂ (f₁ A)).flatten  := by
-  sorry
-
-
-
--- lemma nonisomorphic_groupByinvariant1_2 (A : List PartialMatroid) :
---     (((groupByFirstInvariant A).map) (groupBySecondInvariant)).flatten.Pairwise fun L₁ L₂ ↦
---       L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
---   have := nonisomorphic_groupByFirstInvariant
---   simp at this ⊢
---   let P (L1 L2 : List PartialMatroid) : Prop := List.Forall (fun M₁ => List.Forall (fun M₂ => permutationsComparison 8 M₁.matroid M₂.matroid = false) L2) L1
---   change ∀ (A : List PartialMatroid),List.Pairwise P (groupByFirstInvariant A) at this
---   change List.Pairwise P (List.map groupBySecondInvariant (groupByFirstInvariant A)).flatten
-
-
---   match (groupByFirstInvariant A) with
---   | [] => simp
---   | a :: l =>
---     have ih := nonisomorphic_groupByinvariant1_2 l.flatten
---     simp at ih this
---     change List.Pairwise P (groupBySecondInvariant a ++ (List.map groupBySecondInvariant l).flatten)
---     change List.Pairwise P (List.map groupBySecondInvariant (groupByFirstInvariant l.flatten)).flatten at ih
---     change ∀ (A : List PartialMatroid), List.Pairwise P (groupByFirstInvariant A) at this
---     rw[List.pairwise_append]
---     constructor
---     · have ha := nonisomorphic_groupBySecondInvariant a
---       simp at ha
---       change List.Pairwise P (groupBySecondInvariant a) at ha
---       exact ha
---     · constructor
---       · sorry
---       · sorry
-
-
-
-lemma nonisomorphic_groupByBucket (A : List PartialMatroid) :
-    (groupByBucket A).Pairwise fun L₁ L₂ ↦
-      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
-
-  -- use theorem `nonisomorphic_groupByFirstInvariant` and similar for other invariants
-  unfold groupByBucket
-  simp
-  -- apply nonisomorphic_groupByThirdInvariant
-  -- apply List.Pairwise.map
-  sorry
-
-
-
-
 lemma mem_of_groupByFirstInvariant {A :PartialMatroid} {lA lB: List PartialMatroid}
     (h1 : A ∈ lA)
     (h2 : lA ∈  PartialMatroid.groupByFirstInvariant lB) :
@@ -315,3 +195,238 @@ lemma mem_of_groupByBucket {A :PartialMatroid} {lA lB: List PartialMatroid}
     have := mem_of_groupBySecondInvariant this hla3
     have := mem_of_groupByFirstInvariant this hl4
     exact this
+
+
+-----prove group by bucket_nonisomorphic
+
+
+lemma invariant1_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
+  (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant1 M₁ = invariant1 M₂ := by
+  unfold sameUpToRelabelling at hb
+  simp at hb
+  unfold invariant1
+  have h := @count_of_relabelling M₂.matroid f ha
+  rw[hb] at h
+  rw[sort_flatten_sort] at h
+  rw[sort_flatten_map_sort] at h
+  apply h
+  -- hopefully follows from count_of_relabelling?
+
+
+lemma invariant1_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
+    invariant1 M₁ = invariant1 M₂ := by
+  unfold permutationsComparison at h
+  simp at h
+  obtain ⟨ f, ha,hb ⟩  := h
+  apply invariant1_of_sameUpTolabelling ha hb
+
+
+lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
+    (groupByFirstInvariant A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+
+    unfold groupByFirstInvariant
+    rw [List.pairwise_iff_get]
+    intro i j h
+    rw[List.forall_iff_forall_mem]
+    intro x hx
+    rw[List.forall_iff_forall_mem]
+    intro y hy
+    suffices h : invariant1 x ≠ invariant1 y by
+      contrapose! h
+      apply invariant1_of_isomorphic
+      exact h
+    exact ne_of_groupByValue h.ne hx hy
+
+---Invariant 2
+
+lemma count_of_relabelling_pairs {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
+    count (List.sort (List.flatten (List.sort (List.map List.sort (List.map List.pairs (relabelling L f))))))
+    = count (List.sort (List.flatten (List.map List.pairs L))) := by
+  sorry
+
+lemma invariant2_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
+  (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant2 M₁ = invariant2 M₂ := by
+  unfold sameUpToRelabelling at hb
+  simp at hb
+  unfold invariant2
+  unfold pairing
+  simp
+  have h := @count_of_relabelling_pairs M₂.matroid f ha
+  rw[<- h]
+  rw[<- sort_flatten_map_sort]
+  rw[<- sort_flatten_sort]
+  -- rw[hb] at h
+  -- rw[sort_flatten_sort] at h
+  -- rw[sort_flatten_map_sort] at h
+
+  sorry
+  -- hopefully follows from count_of_relabelling?
+
+
+lemma invariant2_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
+    invariant2 M₁ = invariant2 M₂ := by
+  unfold permutationsComparison at h
+  simp at h
+  obtain ⟨ f, ha,hb ⟩  := h
+  apply invariant2_of_sameUpTolabelling ha hb
+
+
+lemma nonisomorphic_groupBySecondInvariant (A : List PartialMatroid) :
+    (groupBySecondInvariant A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+
+    unfold groupBySecondInvariant
+    rw [List.pairwise_iff_get]
+    intro i j h
+    rw[List.forall_iff_forall_mem]
+    intro x hx
+    rw[List.forall_iff_forall_mem]
+    intro y hy
+    suffices h : invariant2 x ≠ invariant2 y by
+      contrapose! h
+      apply invariant2_of_isomorphic
+      exact h
+    exact ne_of_groupByValue h.ne hx hy
+
+
+
+
+
+
+--Invariant 3 non_isomorphic
+
+lemma invariant3_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
+  (hb : sameUpToRelabelling M₁.matroid M₂.matroid f) : invariant3 M₁ = invariant3 M₂ := by
+  unfold sameUpToRelabelling at hb
+  simp at hb
+  unfold invariant3
+  have h := @count_of_relabelling M₂.matroid f ha
+  rw[hb] at h
+  rw[sort_flatten_sort] at h
+  rw[sort_flatten_map_sort] at h
+  unfold pairing
+  simp
+  sorry
+
+
+
+lemma invariant3_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
+    invariant3 M₁ = invariant3 M₂ := by
+  unfold permutationsComparison at h
+  simp at h
+  obtain ⟨ f, ha,hb ⟩  := h
+  apply invariant3_of_sameUpTolabelling ha hb
+
+
+
+lemma nonisomorphic_groupByThirdInvariant (A : List PartialMatroid) :
+    (groupByThirdInvariant A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+  unfold groupByThirdInvariant
+  rw [List.pairwise_iff_get]
+  intro i j h
+  rw[List.forall_iff_forall_mem]
+  intro x hx
+  rw[List.forall_iff_forall_mem]
+  intro y hy
+  suffices h : invariant3 x ≠ invariant3 y by
+    contrapose! h
+    apply invariant3_of_isomorphic
+    exact h
+  exact ne_of_groupByValue h.ne hx hy
+
+
+
+
+/- Lemma for countBuckets (related to Theorem 1): If the input is an list partial matroids
+(order does matter, for both the lishfts and for the members) with range i < n and lenght = r, then
+the output will be a lawful sparse paving matroid -/
+/- After rethinking, we might not need to prove anything about countBuckets since it is not used
+directly in the main computation.-/
+
+/-- For all partial matroids in a bucket, they do not exist in other buckets even as permutations of
+partial matroids.
+(will probably get used for Theorem 3) -/
+
+/-
+should need mem_of_invariants-/
+
+
+lemma pairwise_trans'{P : α → α → Prop}
+    {f: List α → List (List α)}
+    (hf : ∀ A : List α, (f A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂)
+    {L : List (List α)}
+    (hL : L.Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂)
+    (hf_mem : ∀ A L: List α , ∀ a : α , a ∈ L → L ∈ f A → a ∈ A )  :
+    ((List.map f L).flatten).Pairwise fun L₁ L₂ ↦ L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂ := by
+
+  match L with
+  | [] => simp
+  | a :: L =>
+    simp at hL ⊢
+    rw[List.pairwise_append]
+    constructor
+    · specialize hf a
+      exact hf
+    · constructor
+      exact pairwise_trans' hf hL.2 hf_mem
+      have hL := hL.1
+      intro M₁ hM₁ M₂ hM₂
+      rw[List.forall_iff_forall_mem]
+      simp at hM₂
+      contrapose! hL
+      obtain ⟨x, hx , hMM ⟩ := hL
+      obtain ⟨ l, hl, hM₂ ⟩ := hM₂
+      use l
+      constructor
+      exact hl
+      rw[List.forall_iff_forall_mem] at hMM ⊢
+      simp at hMM ⊢
+      use x
+      constructor
+      exact hf_mem a M₁ x hx hM₁
+      rw[List.forall_iff_forall_mem] at ⊢
+      simp at ⊢
+      obtain ⟨y, hy, hMM⟩ := hMM
+      use y
+      constructor
+      exact hf_mem l M₂ y hy hM₂
+      exact hMM
+
+
+lemma pairwise_trans {P : α → α → Prop}
+    {f₁ f₂ : List α → List (List α)}
+    (hf₁ : ∀ A : List α, (f₁ A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂)
+    (hf₂ : ∀ A : List α, (f₂ A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂)
+    (hf₂_mem : ∀ A L : List α ,∀ a : α , a ∈ L → L ∈ f₂ A  → a ∈ A)  :
+    ∀ A : List α, ((List.map f₂ (f₁ A)).flatten).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ P M₁ M₂  := by
+  intro A
+  specialize hf₁ A
+  apply pairwise_trans' hf₂ hf₁ hf₂_mem
+
+
+
+lemma nonisomorphic_groupByinvariant1_2 (A : List PartialMatroid) :
+    (((groupByFirstInvariant A).map) (groupBySecondInvariant)).flatten.Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+  have := pairwise_trans nonisomorphic_groupByFirstInvariant nonisomorphic_groupBySecondInvariant
+  apply this
+  exact fun A L a a_1 a_2 => mem_of_groupBySecondInvariant a_1 a_2
+
+
+
+lemma nonisomorphic_groupByBucket (A : List PartialMatroid) :
+    (groupByBucket A).Pairwise fun L₁ L₂ ↦
+      L₁.Forall fun M₁ ↦ L₂.Forall fun M₂ ↦ ¬ permutationsComparison 8 M₁.matroid M₂.matroid := by
+
+  -- use theorem `nonisomorphic_groupByFirstInvariant` and similar for other invariants
+  unfold groupByBucket
+  have := pairwise_trans nonisomorphic_groupByinvariant1_2 nonisomorphic_groupByThirdInvariant
+  apply this
+  exact fun A L a a_1 a_2 => mem_of_groupByThirdInvariant a_1 a_2

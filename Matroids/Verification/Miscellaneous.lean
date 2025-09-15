@@ -79,4 +79,10 @@ lemma List.Forall.perm {L₁ L₂ : List X} {P : X → Prop } (hL : L₁.Perm L�
 theorem List.get_mem_zip {X Y : Type*} {L : List X} {M : List Y} (h : L.length = M.length)
     (i : Fin M.length) :
     (L[i], M[i]) ∈ L.zip M := by
-  sorry
+  have := List.length_zip (l₁ := L) (l₂ := M)
+  rw[h] at this
+  simp
+  rw[<- List.getElem_zip (l := L) ( l' := M) (i := i)]
+  · refine getElem_mem ?_
+    rw[this]
+    simp

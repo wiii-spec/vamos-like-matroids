@@ -159,7 +159,9 @@ lemma groupByValue_values_zip_groupByValue (A : List PartialMatroid) (f : Partia
     [LinearOrder X] [Inhabited X] :
     (groupByValue_values A f).zip (groupByValue A f)
     = ((groupByValueAux f A).1 :: (groupByValueAux f A).2) := by
-  sorry
+  unfold groupByValue_values groupByValue
+  simp
+  exact Eq.symm (List.zip_of_prod rfl rfl)
 
 lemma eval_of_mem_groupByValue (A : List PartialMatroid) {f: PartialMatroid → X} [LinearOrder X]
     [Inhabited X] {l : List PartialMatroid} {x : X}
@@ -260,6 +262,7 @@ theorem lt_of_groupByValue_Sorted {A : List PartialMatroid} {f: PartialMatroid �
   specialize mem_j y hy
   rw[mem_i, mem_j]
   exact mono
+
 
 
 --UPDATE: Not needed as all 3 invariant are PartialMatroid → ℕ
