@@ -56,6 +56,10 @@ def sameUpToRelabelling (A B : List (List Nat)) (g : Nat → Nat) : Bool :=
   ((relabelling B g).map List.sort).sort = (A.map List.sort).sort
 
 
+#eval sameUpToRelabelling [[1,2,3,4],[1,2,3,4],[2,1,3,4]] [[1,2,3,4],[1,2,3,4],[1,2,3,4]] (Equiv.swapCore 1 2)
+
+
+
 /--Takes the magnitude of permutations we want to apply. Takes the partial matroids we want to apply
 the permutations to. We use the any function to see if there are any repeat partial matroids. If
 there are repeats, that means that thse are the same partial matroid. It compares two partial

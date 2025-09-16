@@ -241,19 +241,21 @@ lemma nonisomorphic_groupByFirstInvariant (A : List PartialMatroid) :
 ---Invariant 2
 
 
-lemma pairs_map {f : α → β} :
-    (List.pairs ∘ fun B => List.map f B) = List.map (fun x ↦ List.map f x) ∘ (List.pairs) := by
+lemma pairs_map {f : α → β}:
+    ((List.pairs) ∘ fun B => List.map f B) = List.map (fun x ↦ List.map f x) ∘ (List.pairs) := by
 
   sorry
 
 
+
 lemma count_of_relabelling_pairs {L : List (List Nat)} {f : ℕ → ℕ} (ha : f ∈ permutation 8) :
-    count (List.sort (List.flatten (List.sort (List.map List.sort (List.map List.pairs (relabelling L f))))))
-    = count (List.sort (List.flatten (List.map List.pairs L))) := by
+    count (List.sort (List.flatten (List.sort (List.map List.sort (List.map (List.pairs) (relabelling L f))))))
+    = count (List.sort (List.flatten (List.map (List.pairs) L))) := by
   rw[sort_flatten_sort]
   rw[sort_flatten_map_sort]
   unfold relabelling
   simp
+  -- rw[Function.comp_assoc]
   rw[pairs_map]
   rw[<- List.map_comp_map]
   rw[Function.comp]
@@ -262,11 +264,9 @@ lemma count_of_relabelling_pairs {L : List (List Nat)} {f : ℕ → ℕ} (ha : f
   have h_mapf : (fun x => List.map f x).Bijective := by
    simp
    exact hf
-  convert count_of_sort_map (List.map List.pairs L) h_mapf
+  convert count_of_sort_map (List.map (List.pairs) L) h_mapf
 
-lemma map_pairs_sort (L : List (List α)) [LinearOrder α] :
-    (List.map List.sort (List.map List.pairs L)).flatten.sort = L := by
-  sorry
+
 
 
 lemma invariant2_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → ℕ} (ha : f ∈ permutation 8)
@@ -283,14 +283,13 @@ lemma invariant2_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → 
   rw[<- h]
   rw[<- sort_flatten_map_sort]
   rw[sort_flatten_sort] at h ⊢
-
-  -- rw[sort_flatten_sort] at h
-  -- rw[sort_flatten_map_sort] at h
+  -- congr 1
+  rw[sort_flatten_map_sort]
+  rw[sort_flatten_map_sort]
 
   sorry
   -- hopefully follows from count_of_relabelling?
 
-#eval permutationsComparison 8 [[1,2,3,4]] [[2,1,3,4]]
 
 
 lemma invariant2_of_isomorphic (M₁ M₂ : PartialMatroid) (h : permutationsComparison 8 M₁.matroid M₂.matroid) :
@@ -330,12 +329,19 @@ lemma invariant3_of_sameUpTolabelling {M₁ M₂ : PartialMatroid} {f : ℕ → 
   unfold sameUpToRelabelling at hb
   simp at hb
   unfold invariant3
-  have h := @count_of_relabelling M₂.matroid f ha
-  rw[hb] at h
-  rw[sort_flatten_sort] at h
-  rw[sort_flatten_map_sort] at h
   unfold pairing
   simp
+  -- rw[<- sort_flatten_map_sort]
+  -- rw[map_pairs_sort M₁.matroid]
+
+  have h := @count_of_relabelling_pairs (complement M₂.matroid) f ha
+  rw[<- h]
+  rw[<- sort_flatten_map_sort]
+  rw[sort_flatten_sort] at h ⊢
+  -- congr 1
+  rw[sort_flatten_map_sort]
+  rw[sort_flatten_map_sort]
+
   sorry
 
 

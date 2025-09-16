@@ -33,7 +33,9 @@ def invariant1 (A: PartialMatroid) : List Nat := count A.matroid.flatten.sort
 def pairing (A: List (List Nat)) : List Nat := count (((((A.map)) (List.pairs)).flatten).sort)
 
 
-
+#eval pairing [[1,2,3,4],[1,2,3,4],[2,1,3,4]]
+#eval pairing [[1,2,3,4],[1,2,3,4],[1,2,3,4]]
+#eval (((([[1,2,3,4], [2,1,3,4]].map)) (List.pairs)).flatten).sort
  /-
  All pairs that are in the same subset in matroid
 
